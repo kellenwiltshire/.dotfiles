@@ -7,13 +7,10 @@ export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="spaceship"
 
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
 # Spaceship prompt
 SPACESHIP_PROMPT_ASYNC=true #fixes double prompt in warp
 SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_PROMPT_SEPARATE_LINE=false
-source "$HOME/.spaceshiprc.zsh"
 
  SPACESHIP_PROMPT_ORDER=(
     time           # Time stamps section
@@ -78,7 +75,7 @@ source "$HOME/.spaceshiprc.zsh"
 zstyle ':omz:update' mode auto
 zstyle ':omz:update' frequency 14
 
-plugins=(vscode zsh-autosuggestions git zsh-syntax-highlighting you-should-use zsh-bat zoxide fzf-tab)
+plugins=(vscode zsh-autosuggestions git you-should-use zsh-bat zoxide  zsh-syntax-highlighting fzf-tab)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -88,7 +85,6 @@ export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/b
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-. /opt/homebrew/bin/hs-opskit-rc-zsh
 
 alias gco="git checkout"
 
