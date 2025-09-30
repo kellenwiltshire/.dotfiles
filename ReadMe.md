@@ -1,8 +1,15 @@
 ## 🛠️ Zsh Environment Setup
 
+First you need to install `stow` to manage your dotfiles
+
+Remove any conflicting dotfiles contained in this repo from your `~/` directory
+
+Clone this repo and `cd` into `.dotfiles`
+
 ### Automatic
 
 Run the command (only works from fresh state)
+
 ```
 ./zsh-setup.sh
 ```
@@ -86,9 +93,17 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 ```
 
 ---
+
 Then apply changes:
+
+First run in the `.dotfiles` directory
+
+```
+stow .
+```
+
+Then run this command in the `~/` directory
 
 ```bash
 source ~/.zshrc
 ```
-
