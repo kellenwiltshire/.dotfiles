@@ -86,8 +86,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-alias gco="git checkout"
-
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
 fpath=(/Users/kellen.wiltshire/.docker/completions $fpath)
 autoload -Uz compinit
@@ -117,7 +115,9 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 #Alias
 alias garbageday="git branch | grep -v 'master' | xargs git branch -D"
 alias refresh="source ~/.zshrc"
-alias zsh="nano ~/.zshrc"
+alias zsh="code ~/.dotfiles"
+alias gco="git checkout"
+alias c="code ."
 
 autoload -U add-zsh-hook
 load-nvmrc() {
