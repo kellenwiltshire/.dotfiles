@@ -99,7 +99,7 @@ Then apply changes:
 First run in the `.dotfiles` directory
 
 ```
-stow .
+stow home
 ```
 
 Then run this command in the `~/` directory
@@ -107,3 +107,5 @@ Then run this command in the `~/` directory
 ```bash
 source ~/.zshrc
 ```
+
+Refresh Ghostty - Ctrl+Shift+,
