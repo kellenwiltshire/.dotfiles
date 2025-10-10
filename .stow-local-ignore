@@ -1,28 +1,28 @@
 # Comments and blank lines are allowed.
 
+# --- Version Control ---
 RCS
 .+,v
-
 CVS
-\.\#.+       # CVS conflict files / emacs lock files
+\.\#.+      # CVS conflict files / emacs lock files
 \.cvsignore
-
 \.svn
 _darcs
 \.hg
-
 \.git
 \.gitignore
 \.gitmodules
 
-.+~          # emacs backup files
-\#.*\#       # emacs autosave files
+# --- Editor Backups ---
+.+~         # emacs backup files
+\#.*\#      # emacs autosave files
 
+# --- Top-level package files (anchored to the root) ---
 ^/README.*
 ^/LICENSE.*
 ^/COPYING
 ^/ReadMe.*
 
-\.md
-
-\.sh
+# --- File Extensions (Corrected) ---
+\.md$       # Ignore all files ending in .md
+\.sh$       # Ignore all files ending in .sh
