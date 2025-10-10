@@ -23,6 +23,6 @@ _darcs
 ^/COPYING
 ^/ReadMe.*
 
-ReadMe.md
+\.md
 
-zsh-setup.sh
+\.sh
