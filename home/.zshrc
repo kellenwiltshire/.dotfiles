@@ -118,6 +118,8 @@ alias refresh="source ~/.zshrc"
 alias zsh="code ~/.dotfiles"
 alias gco="git checkout"
 alias c="code ."
+alias main="gco main && gl"
+alias develop="gco develop && gl"
 
 autoload -U add-zsh-hook
 load-nvmrc() {
