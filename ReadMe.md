@@ -1,6 +1,10 @@
 ## 🛠️ Zsh Environment Setup
 
-First you need to install `stow` to manage your dotfiles
+First you need to install the required applications:
+
+- `zsh` as your shell - [link](https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH)
+- `oh-my-zsh` as your shell framework - [link](https://ohmyz.sh/#install)
+- `stow` to manage your dotfiles - `sudo pacman -S stow`
 
 Remove any conflicting dotfiles contained in this repo from your `~/` directory
 
