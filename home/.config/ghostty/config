@@ -6,7 +6,7 @@ background-opacity = 0.95
 # Font Configuration
 # -----------------------------------------------------------------------------
 # Values with spaces must be enclosed in quotes
-font-size = 12
+font-size = 14
 
 # -----------------------------------------------------------------------------
 # Quake Mode Configuration
