@@ -24,6 +24,8 @@ quick-terminal-animation-duration = 0.1
 keybind = ctrl+d=new_split:auto
 keybind = ctrl+e=equalize_splits
 keybind = ctrl+x=close_surface
+keybind = ctrl+l=goto_split:right
+keybind = ctrl+a=goto_split:left
 
 # -----------------------------------------------------------------------------
 
