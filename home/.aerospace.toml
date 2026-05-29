@@ -15,7 +15,6 @@ default-root-container-orientation = 'auto'
 
 # Mouse follows focus (Hyprland-like behavior)
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
-on-focus-changed = ['move-mouse window-lazy-center']
 
 automatically-unhide-macos-hidden-apps = false
 
@@ -23,12 +22,12 @@ automatically-unhide-macos-hidden-apps = false
 preset = 'qwerty'
 
 [gaps]
-inner.horizontal = 0
-inner.vertical =   0
-outer.left =       0
-outer.bottom =     0
-outer.top =        0
-outer.right =      0
+inner.horizontal = 6
+inner.vertical =   6
+outer.left =       6
+outer.bottom =     6
+outer.top =        6
+outer.right =      6
 
 [mode.main.binding]
 
@@ -45,18 +44,20 @@ outer.right =      0
 
 # All possible modifiers: cmd, alt, ctrl, shift
 
-alt-slash = 'layout tiles horizontal vertical'
-alt-comma = 'layout accordion horizontal vertical'
+cmd-shift-slash = 'layout tiles horizontal vertical'
+cmd-shift-comma = 'layout accordion horizontal vertical'
 
 cmd-1 = 'workspace 1'
 cmd-2 = 'workspace 2'
 cmd-3 = 'workspace 3'
 cmd-4 = 'workspace 4'
+cmd-5 = 'workspace 5'
 
 cmd-shift-1 = 'move-node-to-workspace 1'
 cmd-shift-2 = 'move-node-to-workspace 2'
 cmd-shift-3 = 'move-node-to-workspace 3'
 cmd-shift-4 = 'move-node-to-workspace 4'
+cmd-shift-5 = 'move-node-to-workspace 5'
 
 ctrl-shift-semicolon = 'mode resize'
  
@@ -74,3 +75,27 @@ b = 'balance-sizes'
  
 # Reset the workspace layout
 r = ['flatten-workspace-tree', 'mode main']
+
+#
+# Application-specific configurations
+#
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Code - Insiders|Cursor|VSCode'
+run = ['layout tiling', 'move-node-to-workspace 1']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Slack|Messages'
+run = ['layout tiling', 'move-node-to-workspace 2']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Ghostty'
+run = ['layout tiling', 'move-node-to-workspace 3']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Proton'
+run = ['layout tiling', 'move-node-to-workspace 4']
+
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = ['layout tiling', 'move-node-to-workspace 5']
