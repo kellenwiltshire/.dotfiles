@@ -113,7 +113,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 #Alias
-alias garbageday="git branch | grep -v 'master' | xargs git branch -D"
+alias garbageday="git branch | grep -v 'main' | xargs git branch -D"
 alias refresh="source ~/.zshrc"
 alias zsh="code ~/.dotfiles"
 alias gco="git checkout"
