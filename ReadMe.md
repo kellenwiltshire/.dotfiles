@@ -1,115 +1,84 @@
-## 🛠️ Zsh Environment Setup
+## 🛠️ Dotfiles Setup
 
-First you need to install the required applications:
+`setup.sh` is an orchestrator that runs each executable script in `runs/` (in
+filename order) and then symlinks the dotfiles into your home directory with `stow`.
 
-- `zsh` as your shell - [link](https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH)
-- `oh-my-zsh` as your shell framework - [link](https://ohmyz.sh/#install)
-- `stow` to manage your dotfiles - `sudo pacman -S stow`
+Every step is idempotent — rerunning the setup updates or skips anything that is
+already installed instead of failing.
 
-Remove any conflicting dotfiles contained in this repo from your `~/` directory
+### What gets installed
 
-Clone this repo and `cd` into `.dotfiles`
+- `zsh` + [Oh My Zsh](https://ohmyz.sh/) and plugins (autosuggestions, syntax-highlighting, zsh-bat, you-should-use, fzf-tab)
+- [Spaceship](https://spaceship-prompt.sh/) prompt theme
+- `zoxide` (smarter `cd`)
+- `nvm` + Node LTS
+- Docker tooling: CLI, `buildx`, `compose`
+- `lazydocker`
+- [Ghostty](https://ghostty.org/) terminal (set as default on Linux)
+- `bun`
+- `go`
 
-### Automatic
+## Usage
 
-Run the command (only works from fresh state)
-
-```
-./zsh-setup.sh
-```
-
----
-
-### Manual Method
-
-### 1. Clone Plugins into Oh My Zsh Custom Directory
-
-Make sure you have [Oh My Zsh](https://ohmyz.sh/) installed. Then clone the following plugins:
-
-#### 🔍 Autosuggestions
+Clone the repo, `cd` into it, and run:
 
 ```bash
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+./setup.sh
 ```
 
-#### 🌈 Syntax Highlighting
+When it finishes it loads your new `~/.zshrc` automatically.
+
+### Run a subset
+
+Pass a filter to only run scripts whose path matches it:
 
 ```bash
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+./setup.sh plugins   # runs runs/20-install-zsh-plugins.sh only
+./setup.sh docker    # runs the docker-related scripts
 ```
 
-#### 🦇 `bat` Integration
+### Operating system
+
+The OS is auto-detected with `uname` and defaults to Linux. Force macOS if needed:
 
 ```bash
-git clone https://github.com/fdellwing/zsh-bat.git \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-bat
+./setup.sh --macos   # or -m
+./setup.sh --linux   # or -l
 ```
 
-#### 🧠 "You Should Use" Plugin
+Each step picks the right package manager automatically (`brew`, `apt`, `dnf`, or
+`pacman`), so the same command works on Linux and macOS.
 
-```bash
-git clone https://github.com/MichaelAquilina/zsh-you-should-use.git \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/you-should-use
-```
+## How it works
 
-#### 🔍🔄 `fzf-tab` for Better Tab Completion
+### Orchestrator
 
-```bash
-git clone https://github.com/Aloxaf/fzf-tab \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fzf-tab
-```
+`setup.sh` resolves the OS, exports `DOTFILES_OS`, then executes every
+executable file in `runs/` in order:
 
----
+| Script | Purpose |
+| --- | --- |
+| `00-install-packages.sh` | `zsh`, `stow`, `zoxide` |
+| `10-install-oh-my-zsh.sh` | Oh My Zsh (installs or updates) |
+| `20-install-zsh-plugins.sh` | Zsh plugins |
+| `30-install-spaceship.sh` | Spaceship prompt theme |
+| `40-install-nvm.sh` | `nvm` + Node LTS |
+| `50-install-docker.sh` | Docker CLI, `buildx`, `compose` |
+| `55-install-ghostty.sh` | Ghostty terminal |
+| `60-install-bun.sh` | `bun` |
+| `70-install-go.sh` | `go` |
+| `80-install-lazydocker.sh` | `lazydocker` |
+| `90-stow-home.sh` | Symlink dotfiles with `stow` |
 
-### 2. Install the Spaceship Prompt Theme
+Shared helpers (package install, git clone/update, OS detection) live in
+`scripts/lib.sh`. To add a step, drop an executable script in `runs/` named with the
+position you want it to run.
 
-```bash
-git clone https://github.com/spaceship-prompt/spaceship-prompt.git \
-  "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1
+### Symlinking dotfiles
 
-ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" \
-  "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
-```
+The final step stows everything under `home/` into your home directory. Before
+linking, any existing real file that would be replaced is renamed to `<file>.backup`
+(timestamped if a `.backup` already exists) so nothing is lost. Symlinks already
+managed by this repo are left untouched, so reruns stay clean.
 
----
-
-### 3. Install `zoxide` (Smarter `cd` Replacement)
-
-Make sure `zoxide` is installed via your system package manager:
-
-```bash
-# For example, using Homebrew:
-brew install zoxide
-```
-
-Then add the following to your `.zshrc`:
-
----
-
-### 4. Install and Set Up `nvm` (Node Version Manager)
-
-```bash
-mkdir -p ~/.nvm
-
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-```
-
----
-
-Then apply changes:
-
-First run in the `.dotfiles` directory
-
-```
-stow home
-```
-
-Then run this command in the `~/` directory
-
-```bash
-source ~/.zshrc
-```
-
-Refresh Ghostty - Ctrl+Shift+,
+`PATH` entries for the installed tools (Bun, Go) live directly in `home/.zshrc`.
