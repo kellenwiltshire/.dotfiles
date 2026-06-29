@@ -14,6 +14,13 @@ font-size = 16
 
 # -----------------------------------------------------------------------------
 
+# Quake Mode Configuration
+
+# -----------------------------------------------------------------------------
+
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+quick-terminal-animation-duration = 0.1
+
 keybind = ctrl+d=new_split:auto
 keybind = ctrl+e=equalize_splits
 keybind = ctrl+x=close_surface
@@ -28,6 +35,12 @@ keybind = ctrl+a=goto_split:left
 
 theme = "Night Owl"
 
+quick-terminal-size = 20%
+
 # Slowdown mouse scrolling
 
 mouse-scroll-multiplier = 0.95
+
+# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
+
+async-backend = epoll
