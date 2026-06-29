@@ -1,9 +1,11 @@
-[[ "$ZSH_SESSION" == fe-dev ]] && return
+[[ "$ZSH_SESSION" == fe-dev ]] && FE_DEV=1
 
-if [[ -f "/opt/homebrew/bin/brew" ]] then
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
   # If you're using macOS, you'll want this enabled
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
+
+if [[ -z "${FE_DEV:-}" ]]; then
 
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -77,9 +79,11 @@ SPACESHIP_PROMPT_SEPARATE_LINE=false
 zstyle ':omz:update' mode auto
 zstyle ':omz:update' frequency 14
 
-plugins=(vscode zsh-autosuggestions git you-should-use zsh-bat zoxide  zsh-syntax-highlighting fzf-tab)
+plugins=(vscode zsh-autosuggestions git you-should-use zsh-bat zsh-syntax-highlighting fzf-tab)
 
 source $ZSH/oh-my-zsh.sh
+
+fi
 
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
@@ -123,28 +127,47 @@ alias c="code ."
 alias main="gco main && gl"
 alias develop="gco develop && gl"
 
-autoload -U add-zsh-hook
-load-nvmrc() {
-  local nvmrc_path
-  nvmrc_path="$(nvm_find_nvmrc)"
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version
-    nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
-      nvm use --silent
-    fi
-  elif [ -n "$(nvm_find_up .)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default --silent
-  fi
-}
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
-
 if [ -f ~/.zshrc.local ]; then
   source ~/.zshrc.local
 fi
 
-eval "$(zoxide init --cmd cd zsh)"
+command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
+
+autoload -U add-zsh-hook
+load-nvmrc() {
+  (( _load_nvmrc_running )) && return
+  _load_nvmrc_running=1
+  local nvmrc_path nvmrc_version nvmrc_node_version default_version node_path nvm_node_path
+  nvmrc_path="$(nvm_find_nvmrc)"
+  if [[ -n "$nvmrc_path" ]]; then
+    nvmrc_version="$(tr -d '[:space:]' < "$nvmrc_path")"
+    if [[ -n "$nvmrc_version" ]]; then
+      nvmrc_node_version="$(nvm version "$nvmrc_version")"
+      if [[ "$nvmrc_node_version" == "N/A" ]]; then
+        nvm install "$nvmrc_version"
+        rehash
+      else
+        node_path="$(command -v node 2>/dev/null)"
+        nvm_node_path="$(nvm which current 2>/dev/null)"
+        if [[ "$(nvm version)" != "$nvmrc_node_version" || "$node_path" != "$nvm_node_path" ]]; then
+          nvm use "$nvmrc_version"
+          rehash
+        fi
+      fi
+    fi
+  elif [[ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ]]; then
+    default_version="$(nvm version default 2>/dev/null)"
+    if [[ -n "$default_version" && "$default_version" != "N/A" && "$(nvm version)" != "$default_version" ]]; then
+      echo "Reverting to nvm default version"
+      nvm use default
+      rehash
+    fi
+  fi
+  _load_nvmrc_running=0
+}
+if (( $+functions[nvm_find_nvmrc] )); then
+  add-zsh-hook -d chpwd load-nvmrc 2>/dev/null
+  add-zsh-hook -d precmd nvmrc-sync-node 2>/dev/null
+  add-zsh-hook chpwd load-nvmrc
+  load-nvmrc
+fi
