@@ -1,22 +1,20 @@
-# Homebrew Bundle — snapshot of the macOS setup.
-# Install with: brew bundle --file=Brewfile  (runs/05-brew-bundle.sh does this)
-
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "homebrew/core"
 tap "hootsuite/homebrew", "hootsuite@hootsuite.ghe.com:hootsuite/homebrew.git", trusted: true
-tap "nikitabobko/tap"
-tap "shaunsingh/sfmono-nerd-font-ligaturized", "https://github.com/shaunsingh/homebrew-SFMono-Nerd-Font-Ligaturized"
-
+tap "nikitabobko/tap", trusted: true
+tap "shaunsingh/sfmono-nerd-font-ligaturized", "https://github.com/shaunsingh/homebrew-SFMono-Nerd-Font-Ligaturized", trusted: true
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Programmable completion for Bash 3.2
 brew "bash-completion"
 # Vector graphics library with cross-device output support
 brew "cairo"
+# Cryptographic recipes and primitives for Python
+brew "cryptography"
 # Load/unload environment variables based on $PWD
 brew "direnv"
 # Pack, ship and run any application as a lightweight container
-brew "docker"
+brew "docker", link: false
 # Docker CLI plugin for extended build capabilities with BuildKit
 brew "docker-buildx"
 # Isolated development environments using Docker
@@ -25,10 +23,10 @@ brew "docker-compose"
 brew "findutils"
 # Command-line fuzzy finder written in Go
 brew "fzf"
-# GitHub command-line tool
-brew "gh"
 # Library and utilities for processing GIFs
 brew "giflib"
+# GitHub command-line tool
+brew "gh"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
 # JavaScript Task Runner
@@ -49,6 +47,8 @@ brew "nvm"
 brew "pkgconf"
 # Easily download, build, install, upgrade, and uninstall Python packages
 brew "python-setuptools"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.12"
 # Build tool for Scala projects
 brew "sbt"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
@@ -61,34 +61,45 @@ brew "yq"
 brew "zoxide"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
-
-# Hootsuite internal tooling (private tap — requires internal auth via hs-dotfiles-init)
+# A tool to format eventbus protobuf messages into json
 brew "hootsuite/homebrew/eventcat"
+# hootctl controls the universe of the Hootsuite developer
 brew "hootsuite/homebrew/hootctl"
+# MacOS binary for service automation tool
 brew "hootsuite/homebrew/hs-deployments"
+# Scripts to setup developers dotfiles & auth for artifactory
 brew "hootsuite/homebrew/hs-dotfiles-init"
+# Hootsuite tooling for developers
 brew "hootsuite/homebrew/hs-opskit"
+# Minikube v2 development environment for Hootsuite
 brew "hootsuite/homebrew/hs-minikube@2"
-
-# Casks — GUI apps and fonts
-cask "aerospace"
+# AeroSpace is an i3-like tiling window manager for macOS
+cask "nikitabobko/tap/aerospace"
+# Write, edit, and chat about your code with AI
+cask "cursor"
+# App to build and share containerised applications and microservices
+cask "docker-desktop"
+# Web browser
+cask "firefox"
 cask "font-sf-mono-nerd-font-ligaturized"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Web browser
+cask "google-chrome"
+# Client for Proton Mail and Proton Calendar
+cask "proton-mail"
+# Control your tools with a few keystrokes
+cask "raycast"
+# Team communication and collaboration software
+cask "slack"
+# Music streaming service
+cask "spotify"
 # System monitor for the menu bar
 cask "stats"
 # JDK from the Eclipse Foundation (Adoptium)
 cask "temurin"
-# Apps installed outside brew today; adding here so a fresh machine matches.
-cask "cursor"
+# Open-source code editor
 cask "visual-studio-code"
-cask "ghostty"
-cask "docker-desktop"
-cask "google-chrome"
-cask "firefox"
-cask "slack"
-cask "raycast"
-cask "spotify"
-cask "proton-mail"
-
 vscode "aaron-bond.better-comments"
 vscode "dabolus.uncanny-cognitive-complexity"
 vscode "dbaeumer.vscode-eslint"
