@@ -129,7 +129,6 @@ alias garbageday="git branch | grep -vE '^\*?\s*(main|master|develop)\$' | xargs
 alias refresh="source ~/.zshrc"
 alias zsh="code ~/.dotfiles"
 alias brewdump="~/.dotfiles/scripts/update-brewfile.sh"
-alias brewup="brew update && brew upgrade && brew cleanup"
 alias gco="git checkout"
 alias c="code ."
 alias main="gco main && gl"
@@ -144,6 +143,28 @@ git() {
     command git "$@"
   fi
 }
+
+if whence -p brew >/dev/null; then
+  # Keep the Brewfile in sync after brew changes (leaves it uncommitted to review).
+  brew() {
+    command brew "$@"
+    local ret=$?
+    if [[ $ret -eq 0 ]]; then
+      case "$1" in
+        install|uninstall|remove|rm|tap|untap)
+          "$HOME/.dotfiles/scripts/update-brewfile.sh"
+          ;;
+      esac
+    fi
+    return $ret
+  }
+
+  brewup() {
+    brew update && brew upgrade && brew cleanup
+    mkdir -p "$HOME/.cache"
+    touch "$HOME/.cache/brewup-stamp"
+  }
+fi
 
 if [ -f ~/.zshrc.local ]; then
   source ~/.zshrc.local
@@ -190,4 +211,15 @@ if (( $+functions[nvm_find_nvmrc] )); then
   add-zsh-hook -d precmd nvmrc-sync-node 2>/dev/null
   add-zsh-hook chpwd load-nvmrc
   load-nvmrc
+fi
+
+# Nudge to update Homebrew at most once a week (time-based; no network on startup).
+if whence -p brew >/dev/null; then
+  _brewup_stamp="$HOME/.cache/brewup-stamp"
+  if [[ ! -e "$_brewup_stamp" || -n "$(find "$_brewup_stamp" -mtime +7 2>/dev/null)" ]]; then
+    print -P "%F{yellow}🍺 Homebrew may be out of date — run 'brewup' to update.%f"
+    mkdir -p "$HOME/.cache"
+    touch "$_brewup_stamp"
+  fi
+  unset _brewup_stamp
 fi

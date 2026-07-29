@@ -36,6 +36,14 @@ brewup   # brew update && brew upgrade && brew cleanup
 `brew upgrade` skips casks that update themselves (Cursor, Docker, Chrome, …). Add
 `--greedy` to force those too, though it's rarely needed.
 
+`shared/.zshrc` also nudges you once a week (at most) on shell start if you haven't run
+`brewup` recently — it's a time-based reminder, so it never hits the network or slows
+startup. Running `brewup` resets the timer.
+
+The `Brewfile` also stays in sync automatically: `shared/.zshrc` wraps `brew` so that after
+a successful `install`, `uninstall`, `tap`, or `untap` it re-runs `brewdump`. The refreshed
+`Brewfile` is left **uncommitted** so you can review the diff and commit it yourself.
+
 ## Usage
 
 Clone the repo, `cd` into it, and run:
