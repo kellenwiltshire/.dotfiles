@@ -44,7 +44,7 @@ Clone the repo, `cd` into it, and run:
 ./setup.sh
 ```
 
-When it finishes it loads your new `~/.zshrc` automatically.
+When it finishes, refresh `~/.zshrc`.
 
 ### Run a subset
 
@@ -71,16 +71,16 @@ Each step picks the right package manager automatically (`brew`, `apt`, `dnf`, o
 
 Defined in `shared/.zshrc` (reload with `refresh` after editing):
 
-| Alias | Does |
-| --- | --- |
-| `refresh` | Reload `~/.zshrc` |
-| `zsh` | Open this dotfiles repo in VS Code |
-| `c` | Open the current directory in VS Code |
-| `brewup` | Update Homebrew and upgrade + clean up everything |
-| `brewdump` | Refresh `Brewfile` from the current Homebrew state |
-| `gco` | `git checkout` |
-| `main` | Check out `main` and pull |
-| `develop` | Check out `develop` and pull |
+| Alias        | Does                                                       |
+| ------------ | ---------------------------------------------------------- |
+| `refresh`    | Reload `~/.zshrc`                                          |
+| `zsh`        | Open this dotfiles repo in VS Code                         |
+| `c`          | Open the current directory in VS Code                      |
+| `brewup`     | Update Homebrew and upgrade + clean up everything          |
+| `brewdump`   | Refresh `Brewfile` from the current Homebrew state         |
+| `gco`        | `git checkout`                                             |
+| `main`       | Check out `main` and pull                                  |
+| `develop`    | Check out `develop` and pull                               |
 | `garbageday` | Delete all local branches except `main`/`master`/`develop` |
 
 ## Cloning repos
@@ -109,24 +109,24 @@ uses that exact version — no manual `yarn set version` needed.
 `setup.sh` resolves the OS, exports `DOTFILES_OS`, then executes every
 executable file in `runs/` in order:
 
-| Script | Purpose |
-| --- | --- |
-| `00-install-homebrew.sh` | Bootstrap Homebrew (macOS only) |
-| `00-install-packages.sh` | `zsh`, `stow`, `zoxide` |
-| `05-brew-bundle.sh` | Install everything in `Brewfile` (macOS only) |
-| `06-create-code-dir.sh` | Ensure `~/code` exists |
-| `10-install-oh-my-zsh.sh` | Oh My Zsh (installs or updates) |
-| `20-install-zsh-plugins.sh` | Zsh plugins |
-| `30-install-spaceship.sh` | Spaceship prompt theme |
-| `40-install-nvm.sh` | `nvm` + Node LTS |
-| `50-install-docker.sh` | Docker CLI, `buildx`, `compose` |
-| `55-install-ghostty.sh` | Ghostty terminal |
-| `60-install-bun.sh` | `bun` |
-| `70-install-go.sh` | `go` |
-| `80-install-lazydocker.sh` | `lazydocker` |
-| `85-macos-defaults.sh` | Apply macOS system defaults (macOS only) |
-| `88-set-default-shell.sh` | Set `zsh` as the login shell (idempotent) |
-| `90-stow-home.sh` | Symlink dotfiles with `stow` |
+| Script                      | Purpose                                       |
+| --------------------------- | --------------------------------------------- |
+| `00-install-homebrew.sh`    | Bootstrap Homebrew (macOS only)               |
+| `00-install-packages.sh`    | `zsh`, `stow`, `zoxide`                       |
+| `05-brew-bundle.sh`         | Install everything in `Brewfile` (macOS only) |
+| `06-create-code-dir.sh`     | Ensure `~/code` exists                        |
+| `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)               |
+| `20-install-zsh-plugins.sh` | Zsh plugins                                   |
+| `30-install-spaceship.sh`   | Spaceship prompt theme                        |
+| `40-install-nvm.sh`         | `nvm` + Node LTS                              |
+| `50-install-docker.sh`      | Docker CLI, `buildx`, `compose`               |
+| `55-install-ghostty.sh`     | Ghostty terminal                              |
+| `60-install-bun.sh`         | `bun`                                         |
+| `70-install-go.sh`          | `go`                                          |
+| `80-install-lazydocker.sh`  | `lazydocker`                                  |
+| `85-macos-defaults.sh`      | Apply macOS system defaults (macOS only)      |
+| `88-set-default-shell.sh`   | Set `zsh` as the login shell (idempotent)     |
+| `90-stow-home.sh`           | Symlink dotfiles with `stow`                  |
 
 Shared helpers (package install, git clone/update, OS detection) live in
 `scripts/lib.sh`. To add a step, drop an executable script in `runs/` named with the
@@ -136,11 +136,11 @@ position you want it to run.
 
 Dotfiles are split into three `stow` packages:
 
-| Package | Contents | Stowed on |
-| --- | --- | --- |
-| `shared/` | `.zshrc`, `.gitconfig`, Ghostty config | always |
-| `macos/` | `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS |
-| `linux/` | Hyprland (`.config/hypr`) | Linux |
+| Package   | Contents                                         | Stowed on |
+| --------- | ------------------------------------------------ | --------- |
+| `shared/` | `.zshrc`, `.gitconfig`, Ghostty config           | always    |
+| `macos/`  | `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS     |
+| `linux/`  | Hyprland (`.config/hypr`)                        | Linux     |
 
 `shared/.zshrc` sources `~/.zshrc.local` if present, so machine- or work-specific aliases
 live in `macos/.zshrc.local` and are only stowed on macOS.
