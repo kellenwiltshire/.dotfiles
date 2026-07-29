@@ -14,8 +14,14 @@ fi
 
 source "$HOME/.nvm/nvm.sh"
 
-echo "📦 Installing Node LTS..."
+current_default="$(nvm version default 2>/dev/null || true)"
 
-nvm install --lts
-nvm alias default lts/*
-nvm use default
+if [[ -z "$current_default" || "$current_default" == "N/A" ]]; then
+  echo "📦 Installing Node LTS and setting it as the default..."
+  nvm install --lts
+  nvm alias default 'lts/*'
+else
+  echo "✅ nvm default already set to $current_default; leaving it as-is."
+fi
+
+nvm use default >/dev/null

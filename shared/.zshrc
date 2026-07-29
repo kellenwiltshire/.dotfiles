@@ -99,7 +99,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/kellen.wiltshire/.docker/completions $fpath)
+fpath=($HOME/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
@@ -125,13 +125,25 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 #Alias
-alias garbageday="git branch | grep -v 'main' | xargs git branch -D"
+alias garbageday="git branch | grep -vE '^\*?\s*(main|master|develop)\$' | xargs git branch -D"
 alias refresh="source ~/.zshrc"
 alias zsh="code ~/.dotfiles"
+alias brewdump="~/.dotfiles/scripts/update-brewfile.sh"
+alias brewup="brew update && brew upgrade && brew cleanup"
 alias gco="git checkout"
 alias c="code ."
 alias main="gco main && gl"
 alias develop="gco develop && gl"
+
+# Clone into ~/code by default; pass an explicit target (e.g. `.`) to override.
+git() {
+  if [[ "$1" == clone && $# -eq 2 && "$2" != -* ]]; then
+    mkdir -p "$HOME/code"
+    command git clone "$2" "$HOME/code/$(basename "${2%.git}")"
+  else
+    command git "$@"
+  fi
+}
 
 if [ -f ~/.zshrc.local ]; then
   source ~/.zshrc.local
