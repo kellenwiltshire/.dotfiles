@@ -67,6 +67,34 @@ The OS is auto-detected with `uname` and defaults to Linux. Force macOS if neede
 Each step picks the right package manager automatically (`brew`, `apt`, `dnf`, or
 `pacman`), so the same command works on Linux and macOS.
 
+## Manual steps after setup
+
+`setup.sh` handles system defaults, the login shell, tools, and symlinks. A few things
+still need a human:
+
+**Both OSes**
+
+- Reload your shell (`refresh`) or log out/in — some changes (login shell, macOS key
+  repeat) only apply after that.
+- Generate an SSH key (`ssh-keygen -t ed25519 -C "you@example.com"`) and add it to
+  GitHub/GHE.
+- Sign in to apps and browsers.
+
+**macOS**
+
+- Grant **AeroSpace** Accessibility permission (System Settings → Privacy & Security →
+  Accessibility), or it can't move windows.
+- Set Ghostty as the default terminal (Ghostty → Settings) — there's no clean CLI for it.
+- For Hootsuite tooling: run `hs-dotfiles-init` to auth the private `hootsuite/homebrew`
+  tap, then `./setup.sh brew-bundle` to finish installing those formulae.
+
+**Linux (Omarchy)**
+
+- Log out/in for the `zsh` login-shell change to take effect.
+- Relaunch Hyprland (Super+Esc → Relaunch) to apply the stowed config.
+- Edit `linux/.config/hypr/monitors.conf` and the NVIDIA env vars in `hyprland.conf` if
+  the machine's hardware differs.
+
 ## Handy aliases
 
 Defined in `shared/.zshrc` (reload with `refresh` after editing):
