@@ -55,8 +55,6 @@ brew "sbt"
 brew "stow"
 # Secures, stores, and tightly controls access to secrets
 brew "vault"
-# JavaScript package manager
-brew "yarn"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
 # Shell extension to navigate your filesystem faster

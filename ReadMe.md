@@ -94,6 +94,14 @@ git clone https://github.com/org/repo.git .  # explicit target → clones into t
 
 Any invocation with an explicit target (or extra flags) is passed straight through to `git`.
 
+## Node & Yarn versions
+
+`nvm` handles Node per repo via `.nvmrc` (auto-switching on `cd`). Yarn/pnpm are handled by
+[Corepack](https://github.com/nodejs/corepack): setup runs `corepack enable`, and the
+`.zshrc` `nvm` hook re-enables it whenever a new Node version is installed or switched to.
+In any repo that declares a `"packageManager"` field in `package.json`, `yarn` automatically
+uses that exact version — no manual `yarn set version` needed.
+
 ## How it works
 
 ### Orchestrator

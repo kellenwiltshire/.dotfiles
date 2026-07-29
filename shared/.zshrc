@@ -163,12 +163,14 @@ load-nvmrc() {
       nvmrc_node_version="$(nvm version "$nvmrc_version")"
       if [[ "$nvmrc_node_version" == "N/A" ]]; then
         nvm install "$nvmrc_version"
+        command -v corepack >/dev/null && corepack enable
         rehash
       else
         node_path="$(command -v node 2>/dev/null)"
         nvm_node_path="$(nvm which current 2>/dev/null)"
         if [[ "$(nvm version)" != "$nvmrc_node_version" || "$node_path" != "$nvm_node_path" ]]; then
           nvm use "$nvmrc_version"
+          command -v corepack >/dev/null && corepack enable
           rehash
         fi
       fi

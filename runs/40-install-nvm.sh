@@ -25,3 +25,9 @@ else
 fi
 
 nvm use default >/dev/null
+
+# Corepack manages yarn/pnpm per repo via package.json "packageManager".
+if command -v corepack >/dev/null; then
+  echo "🧶 Enabling Corepack (per-repo yarn/pnpm versions)..."
+  corepack enable
+fi
