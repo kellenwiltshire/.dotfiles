@@ -129,6 +129,7 @@ alias garbageday="git branch | grep -vE '^\*?\s*(main|master|develop)\$' | xargs
 alias refresh="source ~/.zshrc"
 alias zsh="code ~/.dotfiles"
 alias brewdump="~/.dotfiles/scripts/update-brewfile.sh"
+alias pacdump="~/.dotfiles/scripts/update-pacfile.sh"
 alias gco="git checkout"
 alias c="code ."
 alias main="gco main && gl"

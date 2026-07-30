@@ -13,6 +13,9 @@ VS Code, Ghostty, Docker Desktop, Chrome, Firefox, Slack, Raycast, Spotify, Prot
 fonts, and VS Code extensions. After installing new things, refresh it with the `brewdump`
 alias (or run `scripts/update-brewfile.sh`), then review the diff and commit.
 
+On Linux (Omarchy), `packages/arch-packages.txt` plays the same role for your *added*
+packages — see [Arch/Omarchy packages](#archomarchy-packages).
+
 - `zsh` + [Oh My Zsh](https://ohmyz.sh/) and plugins (autosuggestions, syntax-highlighting, zsh-bat, you-should-use, fzf-tab)
 - [Spaceship](https://spaceship-prompt.sh/) prompt theme
 - `zoxide` (smarter `cd`)
@@ -43,6 +46,30 @@ startup. Running `brewup` resets the timer.
 The `Brewfile` also stays in sync automatically: `shared/.zshrc` wraps `brew` so that after
 a successful `install`, `uninstall`, `tap`, or `untap` it re-runs `brewdump`. The refreshed
 `Brewfile` is left **uncommitted** so you can review the diff and commit it yourself.
+
+## Arch/Omarchy packages
+
+The Linux equivalent of the `Brewfile` is `packages/arch-packages.txt`. It tracks only the
+packages **you added on top of Omarchy's defaults**, not Omarchy's full base set.
+
+`pacdump` computes that by taking your explicitly-installed packages (`pacman -Qqe`) and
+subtracting Omarchy's canonical manifests
+(`~/.local/share/omarchy/install/omarchy-base.packages` and `omarchy-other.packages`):
+
+```bash
+pacdump   # writes packages/arch-packages.txt, then review + commit the diff
+```
+
+On a new Omarchy machine, install Omarchy first (which restores the base set), then
+`setup.sh` runs `runs/05-arch-packages.sh`, which installs everything in the list with
+`yay -S --needed` (works for both official-repo and AUR packages). Re-running is safe —
+`--needed` skips anything already present.
+
+Notes:
+
+- Version pinning isn't used; you get whatever the current mirrors/AUR serve.
+- Run this on a real Omarchy box — the manifests only exist there. Off Omarchy (e.g. plain
+  Arch) `pacdump` falls back to listing all explicit packages, since there's no baseline.
 
 ## Usage
 
@@ -114,6 +141,7 @@ Defined in `shared/.zshrc` (reload with `refresh` after editing):
 | `c`          | Open the current directory in VS Code                      |
 | `brewup`     | Update Homebrew and upgrade + clean up everything          |
 | `brewdump`   | Refresh `Brewfile` from the current Homebrew state         |
+| `pacdump`    | Refresh `packages/arch-packages.txt` (Linux/Omarchy)       |
 | `gco`        | `git checkout`                                             |
 | `main`       | Check out `main` and pull                                  |
 | `develop`    | Check out `develop` and pull                               |
@@ -150,6 +178,7 @@ executable file in `runs/` in order:
 | `00-install-homebrew.sh`    | Bootstrap Homebrew (macOS only)               |
 | `00-install-packages.sh`    | `zsh`, `stow`, `zoxide`                       |
 | `05-brew-bundle.sh`         | Install everything in `Brewfile` (macOS only) |
+| `05-arch-packages.sh`       | Install `packages/arch-packages.txt` (Linux only) |
 | `06-create-code-dir.sh`     | Ensure `~/code` exists                        |
 | `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)               |
 | `20-install-zsh-plugins.sh` | Zsh plugins                                   |

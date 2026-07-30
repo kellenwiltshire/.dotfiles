@@ -1,0 +1,3 @@
+# Arch/Omarchy packages added on top of Omarchy's defaults.
+# Regenerate: pacdump   Restore: runs/05-arch-packages.sh (run by setup.sh on Linux).
+# Run `pacdump` on your Omarchy machine to populate this list.
