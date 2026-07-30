@@ -18,13 +18,17 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 
 - `zsh` + [Oh My Zsh](https://ohmyz.sh/) and plugins (autosuggestions, syntax-highlighting, zsh-bat, you-should-use, fzf-tab)
 - [Spaceship](https://spaceship-prompt.sh/) prompt theme
-- `zoxide` (smarter `cd`)
+- `zoxide` (smarter `cd`), `fzf` (with `Ctrl-R`/`Ctrl-T`/`Alt-C` keybindings), `direnv`
+- Modern CLI tools: `bat`, `eza`, `fd`, `ripgrep`, `jq`, `git-delta`, `lazygit`, `tealdeer` (`tldr`), `btop`
 - `nvm` + Node LTS
 - Docker tooling: CLI, `buildx`, `compose`
 - `lazydocker`
 - [Ghostty](https://ghostty.org/) terminal (set as default on Linux)
 - `bun`
 - `go`
+
+On Linux these modern CLI tools are installed by `runs/00-install-packages.sh` for parity, so
+the shared `zsh`/`git` config never points at a missing binary.
 
 ### Updating
 
@@ -139,6 +143,7 @@ Defined in `shared/.zshrc` (reload with `refresh` after editing):
 | `refresh`    | Reload `~/.zshrc`                                          |
 | `zsh`        | Open this dotfiles repo in VS Code                         |
 | `c`          | Open the current directory in VS Code                      |
+| `ls`/`ll`/`la`/`lt` | `eza` listings (plain / long / long+hidden / tree) |
 | `brewup`     | Update Homebrew and upgrade + clean up everything          |
 | `brewdump`   | Refresh `Brewfile` from the current Homebrew state         |
 | `pacdump`    | Refresh `packages/arch-packages.txt` (Linux/Omarchy)       |
@@ -146,6 +151,25 @@ Defined in `shared/.zshrc` (reload with `refresh` after editing):
 | `main`       | Check out `main` and pull                                  |
 | `develop`    | Check out `develop` and pull                               |
 | `garbageday` | Delete all local branches except `main`/`master`/`develop` |
+
+## Window management
+
+[AeroSpace](https://github.com/nikitabobko/AeroSpace) (macOS) and Hyprland (Omarchy) are kept
+in sync so muscle memory carries across machines. Workspaces hold the same class of app on
+both:
+
+| WS | Apps |
+| -- | ---- |
+| 1  | Editor (Cursor / VS Code) |
+| 2  | Chat (Slack, Messages / Discord, WhatsApp) |
+| 3  | Terminal (Ghostty) |
+| 4  | Mail (Proton Mail) |
+| 5  | Music (Spotify) |
+
+Browsers are intentionally left unassigned on both. Within a workspace, AeroSpace uses
+`alt`+`h`/`j`/`k`/`l` to focus and `alt`+`shift`+`h`/`j`/`k`/`l` to move windows — the mirror
+of Hyprland's arrow-key navigation (`alt` on macOS ≈ `super` on Linux). Workspace switching
+uses `cmd`+number on macOS and `super`+number on Linux.
 
 ## Cloning repos
 

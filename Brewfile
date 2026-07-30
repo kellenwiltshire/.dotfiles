@@ -7,6 +7,10 @@ tap "shaunsingh/sfmono-nerd-font-ligaturized", "https://github.com/shaunsingh/ho
 brew "bash"
 # Programmable completion for Bash 3.2
 brew "bash-completion"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
 # Vector graphics library with cross-device output support
 brew "cairo"
 # Cryptographic recipes and primitives for Python
@@ -19,6 +23,10 @@ brew "docker", link: false
 brew "docker-buildx"
 # Isolated development environments using Docker
 brew "docker-compose"
+# Modern, maintained replacement for ls
+brew "eza"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
 # Collection of GNU find, xargs, and locate
 brew "findutils"
 # Command-line fuzzy finder written in Go
@@ -27,16 +35,22 @@ brew "fzf"
 brew "giflib"
 # GitHub command-line tool
 brew "gh"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
 # JavaScript Task Runner
 brew "grunt-cli"
 # Image manipulation library
 brew "jpeg"
+# Lightweight and flexible command-line JSON processor
+brew "jq"
 # Generic command-line non-JVM Apache Kafka producer and consumer
 brew "kcat"
 # Lazier way to manage everything docker
 brew "lazydocker"
+# Simple terminal UI for git commands
+brew "lazygit"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -49,18 +63,20 @@ brew "pkgconf"
 brew "python-setuptools"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.12"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
 # Build tool for Scala projects
 brew "sbt"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
+# Very fast implementation of tldr in Rust
+brew "tealdeer"
 # Secures, stores, and tightly controls access to secrets
 brew "vault"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
-# Fish shell like syntax highlighting for zsh
-brew "zsh-syntax-highlighting"
 # A tool to format eventbus protobuf messages into json
 brew "hootsuite/homebrew/eventcat"
 # hootctl controls the universe of the Hootsuite developer
@@ -121,3 +137,4 @@ vscode "visualstudioexptteam.intellicode-api-usage-examples"
 vscode "visualstudioexptteam.vscodeintellicode"
 vscode "vitest.explorer"
 vscode "yoavbls.pretty-ts-errors"
+npm "corepack"

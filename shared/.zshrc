@@ -121,8 +121,13 @@ setopt hist_find_no_dups
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+if command -v eza >/dev/null; then
+  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons --group-directories-first $realpath'
+  zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always --icons --group-directories-first $realpath'
+else
+  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+  zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+fi
 
 #Alias
 alias garbageday="git branch | grep -vE '^\*?\s*(main|master|develop)\$' | xargs git branch -D"
@@ -172,6 +177,21 @@ if [ -f ~/.zshrc.local ]; then
 fi
 
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
+command -v direnv >/dev/null && eval "$(direnv hook zsh)"
+command -v fzf >/dev/null && eval "$(fzf --zsh 2>/dev/null)"
+
+if command -v fd >/dev/null; then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+fi
+
+if command -v eza >/dev/null; then
+  alias ls='eza --group-directories-first'
+  alias ll='eza -lh --group-directories-first --git'
+  alias la='eza -lah --group-directories-first --git'
+  alias lt='eza --tree --level=2'
+fi
 
 autoload -U add-zsh-hook
 load-nvmrc() {
