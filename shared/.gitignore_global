@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.directory
+
+# Editor / IDE
+*.swp
+*.swo
+.idea/
+
+# direnv
+.direnv/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
