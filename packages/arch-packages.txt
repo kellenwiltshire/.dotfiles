@@ -1,3 +1,25 @@
 # Arch/Omarchy packages added on top of Omarchy's defaults.
 # Regenerate: pacdump   Restore: runs/05-arch-packages.sh (run by setup.sh on Linux).
-# Run `pacdump` on your Omarchy machine to populate this list.
+amd-ucode
+bitwarden
+bitwarden-cli
+bruno
+bun
+docker-credential-secretservice
+firefox
+freerdp
+ghostty
+git-delta
+go
+noto-fonts-extra
+omarchy-chromium
+omarchy-keyring
+openbsd-netcat
+python-pip
+solaar
+stow
+thunderbird
+ttf-cascadia-mono-nerd
+visual-studio-code-bin
+wayfreeze
+zsh
