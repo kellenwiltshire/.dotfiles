@@ -55,8 +55,6 @@ brew "lazygit"
 brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
-# Manage multiple Node.js versions
-brew "nvm"
 # Package compiler and linker metadata toolkit
 brew "pkgconf"
 # Easily download, build, install, upgrade, and uninstall Python packages
@@ -93,21 +91,13 @@ brew "hootsuite/homebrew/hs-minikube@2"
 cask "nikitabobko/tap/aerospace"
 # Write, edit, and chat about your code with AI
 cask "cursor"
-# App to build and share containerised applications and microservices
-cask "docker-desktop"
-# Web browser
-cask "firefox"
 cask "font-sf-mono-nerd-font-ligaturized"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-# Web browser
-cask "google-chrome"
 # Client for Proton Mail and Proton Calendar
 cask "proton-mail"
 # Control your tools with a few keystrokes
 cask "raycast"
-# Team communication and collaboration software
-cask "slack"
 # Music streaming service
 cask "spotify"
 # System monitor for the menu bar

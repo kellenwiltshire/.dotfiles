@@ -9,9 +9,18 @@ already installed instead of failing.
 ### What gets installed
 
 On macOS, `Brewfile` is the source of truth for CLI tools, GUI apps (AeroSpace, Cursor,
-VS Code, Ghostty, Docker Desktop, Chrome, Firefox, Slack, Raycast, Spotify, Proton Mail),
-fonts, and VS Code extensions. After installing new things, refresh it with the `brewdump`
-alias (or run `scripts/update-brewfile.sh`), then review the diff and commit.
+VS Code, Ghostty, Raycast, Spotify, Proton Mail), fonts, and VS Code extensions. After
+installing new things, refresh it with the `brewdump` alias (or run
+`scripts/update-brewfile.sh`), then review the diff and commit.
+
+**Not in the Brewfile on purpose:** Chrome, Firefox, Slack and Docker Desktop are deployed
+by Jamf and owned by `root` in `/Applications`. Homebrew had *adopted* them (see
+`HOMEBREW_CASK_OPTS=--adopt` in `runs/05-brew-bundle.sh`) but could never upgrade them —
+`brew upgrade --cask` fails on a root-owned bundle and leaves a multi-GB staging copy
+behind. Worse, brew compares against its own install receipt, so once Keystone or Jamf
+updates an app in the background `brew bundle check` reports drift forever. They're left to
+IT. Don't re-add them: this note is here rather than in the `Brewfile` because `brewdump`
+rewrites that file from scratch.
 
 On Linux (Omarchy), `packages/arch-packages.txt` plays the same role for your *added*
 packages — see [Arch/Omarchy packages](#archomarchy-packages).
@@ -260,11 +269,17 @@ Dotfiles are split into three `stow` packages:
 | Package   | Contents                                         | Stowed on |
 | --------- | ------------------------------------------------ | --------- |
 | `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty config | always |
-| `macos/`  | `.gitconfig` (work email), `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS |
+| `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS |
 | `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`) | Linux |
 
 `shared/.zshrc` sources `~/.zshrc.local` if present, so machine- or work-specific aliases
 live in `macos/.zshrc.local` and are only stowed on macOS.
+
+`.ssh/config` lives in `macos/` rather than `shared/` because it uses Apple's `UseKeychain`.
+
+Editor settings are deliberately **not** tracked: Cursor is work-only on a single machine,
+and VS Code on Omarchy uses its own Settings Sync. The `Brewfile` still tracks the VS Code
+extension *list*.
 
 The final step stows `shared` plus the package for the detected OS, so macOS never
 symlinks the Hyprland config and Linux never symlinks the AeroSpace config. Before
