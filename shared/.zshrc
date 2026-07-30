@@ -5,6 +5,9 @@ if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# Must precede compinit (run by oh-my-zsh below) for Docker CLI completions to load.
+fpath=($HOME/.docker/completions $fpath)
+
 if [[ -z "${FE_DEV:-}" ]]; then
 
 export ZSH="$HOME/.oh-my-zsh"
@@ -83,6 +86,9 @@ plugins=(vscode zsh-autosuggestions git you-should-use zsh-bat zsh-syntax-highli
 
 source $ZSH/oh-my-zsh.sh
 
+else
+  autoload -Uz compinit
+  compinit
 fi
 
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
@@ -94,15 +100,26 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Go (binaries installed via `go install`)
 export PATH="$HOME/go/bin:$PATH"
 
+# EDITOR_CMD is the bare command; EDITOR adds --wait for GUI editors so git blocks
+# until the buffer is closed.
+for _candidate in cursor code nvim vim vi; do
+  if command -v "$_candidate" >/dev/null; then
+    export EDITOR_CMD="$_candidate"
+    break
+  fi
+done
+unset _candidate
+
+case "$EDITOR_CMD" in
+  cursor|code) export EDITOR="$EDITOR_CMD --wait" ;;
+  "")          ;;
+  *)           export EDITOR="$EDITOR_CMD" ;;
+esac
+export VISUAL="$EDITOR"
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=($HOME/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
 
 # History
 HISTSIZE=5000
@@ -132,7 +149,7 @@ fi
 #Alias
 alias garbageday="git branch | grep -vE '^\*?\s*(main|master|develop)\$' | xargs git branch -D"
 alias refresh="source ~/.zshrc"
-alias zsh="code ~/.dotfiles"
+alias dots="\$EDITOR_CMD ~/.dotfiles"
 alias brewdump="~/.dotfiles/scripts/update-brewfile.sh"
 alias pacdump="~/.dotfiles/scripts/update-pacfile.sh"
 alias gco="git checkout"

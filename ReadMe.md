@@ -115,8 +115,10 @@ still need a human:
 
 - Reload your shell (`refresh`) or log out/in — some changes (login shell, macOS key
   repeat) only apply after that.
-- Generate an SSH key (`ssh-keygen -t ed25519 -C "you@example.com"`) and add it to
-  GitHub/GHE.
+- Generate an SSH key (`ssh-keygen -t ed25519 -C "you@example.com"`) — **required**, since
+  commit signing is on and commits fail without it. Add it to GitHub/GHE as an
+  **authentication** key, and again as a **signing** key for the Verified badge. Then re-run
+  `./setup.sh ssh-allowed-signers` so local verification picks it up.
 - Sign in to apps and browsers.
 
 **macOS**
@@ -141,7 +143,7 @@ Defined in `shared/.zshrc` (reload with `refresh` after editing):
 | Alias        | Does                                                       |
 | ------------ | ---------------------------------------------------------- |
 | `refresh`    | Reload `~/.zshrc`                                          |
-| `zsh`        | Open this dotfiles repo in VS Code                         |
+| `dots`       | Open this dotfiles repo in `$EDITOR_CMD`                   |
 | `c`          | Open the current directory in VS Code                      |
 | `ls`/`ll`/`la`/`lt` | `eza` listings (plain / long / long+hidden / tree) |
 | `brewup`     | Update Homebrew and upgrade + clean up everything          |
@@ -171,6 +173,11 @@ Browsers are intentionally left unassigned on both. Within a workspace, AeroSpac
 of Hyprland's arrow-key navigation (`alt` on macOS ≈ `super` on Linux). Workspace switching
 uses `cmd`+number on macOS and `super`+number on Linux.
 
+Ghostty's own splits sit one level down on `cmd`+`alt`+`h`/`j`/`k`/`l` (the vim twin of its
+built-in `cmd`+`alt`+arrows), with `cmd`+`d` to split and `cmd`+`w` to close. They stay off
+`ctrl` on purpose: `ctrl`+`a`/`d`/`e`/`l`/`x` are readline keys (start of line, EOF, end of
+line, clear, emacs prefix) and Ghostty swallows any key it has bound before the shell sees it.
+
 ## Cloning repos
 
 Setup creates `~/code`, and `shared/.zshrc` wraps `git` so a bare clone lands there:
@@ -181,6 +188,30 @@ git clone https://github.com/org/repo.git .  # explicit target → clones into t
 ```
 
 Any invocation with an explicit target (or extra flags) is passed straight through to `git`.
+
+## Git identity & commit signing
+
+Everything except the email address lives in `shared/.gitconfig-common`, which both OS
+configs pull in with a git `[include]`. That makes `macos/.gitconfig` and `linux/.gitconfig`
+four lines each — the include plus one email — so a setting can't drift between the two:
+
+```ini
+[include]
+	path = ~/.gitconfig-common
+[user]
+	email = kellen.wiltshire@hootsuite.com   # macOS (work machine)
+```
+
+The Mac only ever holds work repos, so it uses the Hootsuite identity everywhere with no
+per-repo split; Omarchy uses the personal address. The two are never stowed together.
+
+Both sign every commit with `~/.ssh/id_ed25519` (SSH signing, not GPG), so **each machine
+needs that key or commits will fail outright** — `git commit` aborts with `failed to write
+commit object` rather than falling back to unsigned. `runs/91-ssh-allowed-signers.sh` writes
+`~/.ssh/allowed_signers` so `git log --show-signature` verifies locally, and warns loudly at
+setup time if the key is missing. For a green "Verified" badge, upload the **same public key
+again** as a *signing* key — a separate entry from the authentication key — in GHE and/or
+github.com under Settings → SSH and GPG keys.
 
 ## Node & Yarn versions
 
@@ -216,6 +247,7 @@ executable file in `runs/` in order:
 | `85-macos-defaults.sh`      | Apply macOS system defaults (macOS only)      |
 | `88-set-default-shell.sh`   | Set `zsh` as the login shell (idempotent)     |
 | `90-stow-home.sh`           | Symlink dotfiles with `stow`                  |
+| `91-ssh-allowed-signers.sh` | Write `~/.ssh/allowed_signers` for SSH commit signing |
 
 Shared helpers (package install, git clone/update, OS detection) live in
 `scripts/lib.sh`. To add a step, drop an executable script in `runs/` named with the
@@ -227,9 +259,9 @@ Dotfiles are split into three `stow` packages:
 
 | Package   | Contents                                         | Stowed on |
 | --------- | ------------------------------------------------ | --------- |
-| `shared/` | `.zshrc`, `.gitconfig`, Ghostty config           | always    |
-| `macos/`  | `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS     |
-| `linux/`  | Hyprland (`.config/hypr`)                        | Linux     |
+| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty config | always |
+| `macos/`  | `.gitconfig` (work email), `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS |
+| `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`) | Linux |
 
 `shared/.zshrc` sources `~/.zshrc.local` if present, so machine- or work-specific aliases
 live in `macos/.zshrc.local` and are only stowed on macOS.

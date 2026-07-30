@@ -21,11 +21,16 @@ font-size = 16
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
 quick-terminal-animation-duration = 0.1
 
-keybind = ctrl+d=new_split:auto
-keybind = ctrl+e=equalize_splits
-keybind = ctrl+x=close_surface
-keybind = ctrl+l=goto_split:right
-keybind = ctrl+a=goto_split:left
+# Splits stay on cmd: ctrl+a/d/e/l/x are readline keys (bol, EOF, eol, clear,
+# emacs prefix) and Ghostty consumes a bound key before the shell sees it.
+# cmd+alt+hjkl is the vim twin of Ghostty's built-in cmd+alt+arrows.
+# close_surface is left on its cmd+w default.
+keybind = cmd+d=new_split:auto
+keybind = cmd+alt+e=equalize_splits
+keybind = cmd+alt+h=goto_split:left
+keybind = cmd+alt+j=goto_split:down
+keybind = cmd+alt+k=goto_split:up
+keybind = cmd+alt+l=goto_split:right
 
 # -----------------------------------------------------------------------------
 

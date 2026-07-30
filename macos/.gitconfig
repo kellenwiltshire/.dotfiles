@@ -1,27 +1,4 @@
+[include]
+	path = ~/.gitconfig-common
 [user]
 	email = kellen.wiltshire@hootsuite.com
-	name = Kellen Wiltshire
-[core]
-	pager = delta
-	excludesfile = ~/.gitignore_global
-[interactive]
-	diffFilter = delta --color-only
-[delta]
-	navigate = true
-	line-numbers = true
-[merge]
-	conflictstyle = zdiff3
-[diff]
-	colorMoved = default
-[push]
-	autoSetupRemote = true
-[fetch]
-	prune = true
-[pull]
-	ff = only
-[rerere]
-	enabled = true
-[init]
-	defaultBranch = main
-[branch]
-	sort = -committerdate
