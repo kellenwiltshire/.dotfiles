@@ -156,6 +156,7 @@ alias gco="git checkout"
 alias c="code ."
 alias main="gco main && gl"
 alias develop="gco develop && gl"
+alias lz="lazygit"
 
 # Clone into ~/code by default; pass an explicit target (e.g. `.`) to override.
 git() {

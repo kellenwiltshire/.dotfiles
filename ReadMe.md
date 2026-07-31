@@ -14,7 +14,7 @@ installing new things, refresh it with the `brewdump` alias (or run
 `scripts/update-brewfile.sh`), then review the diff and commit.
 
 **Not in the Brewfile on purpose:** Chrome, Firefox, Slack and Docker Desktop are deployed
-by Jamf and owned by `root` in `/Applications`. Homebrew had *adopted* them (see
+by Jamf and owned by `root` in `/Applications`. Homebrew had _adopted_ them (see
 `HOMEBREW_CASK_OPTS=--adopt` in `runs/05-brew-bundle.sh`) but could never upgrade them —
 `brew upgrade --cask` fails on a root-owned bundle and leaves a multi-GB staging copy
 behind. Worse, brew compares against its own install receipt, so once Keystone or Jamf
@@ -22,7 +22,7 @@ updates an app in the background `brew bundle check` reports drift forever. They
 IT. Don't re-add them: this note is here rather than in the `Brewfile` because `brewdump`
 rewrites that file from scratch.
 
-On Linux (Omarchy), `packages/arch-packages.txt` plays the same role for your *added*
+On Linux (Omarchy), `packages/arch-packages.txt` plays the same role for your _added_
 packages — see [Arch/Omarchy packages](#archomarchy-packages).
 
 - `zsh` + [Oh My Zsh](https://ohmyz.sh/) and plugins (autosuggestions, syntax-highlighting, zsh-bat, you-should-use, fzf-tab)
@@ -149,19 +149,20 @@ still need a human:
 
 Defined in `shared/.zshrc` (reload with `refresh` after editing):
 
-| Alias        | Does                                                       |
-| ------------ | ---------------------------------------------------------- |
-| `refresh`    | Reload `~/.zshrc`                                          |
-| `dots`       | Open this dotfiles repo in `$EDITOR_CMD`                   |
-| `c`          | Open the current directory in VS Code                      |
-| `ls`/`ll`/`la`/`lt` | `eza` listings (plain / long / long+hidden / tree) |
-| `brewup`     | Update Homebrew and upgrade + clean up everything          |
-| `brewdump`   | Refresh `Brewfile` from the current Homebrew state         |
-| `pacdump`    | Refresh `packages/arch-packages.txt` (Linux/Omarchy)       |
-| `gco`        | `git checkout`                                             |
-| `main`       | Check out `main` and pull                                  |
-| `develop`    | Check out `develop` and pull                               |
-| `garbageday` | Delete all local branches except `main`/`master`/`develop` |
+| Alias               | Does                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| `refresh`           | Reload `~/.zshrc`                                          |
+| `dots`              | Open this dotfiles repo in `$EDITOR_CMD`                   |
+| `c`                 | Open the current directory in VS Code                      |
+| `ls`/`ll`/`la`/`lt` | `eza` listings (plain / long / long+hidden / tree)         |
+| `brewup`            | Update Homebrew and upgrade + clean up everything          |
+| `brewdump`          | Refresh `Brewfile` from the current Homebrew state         |
+| `pacdump`           | Refresh `packages/arch-packages.txt` (Linux/Omarchy)       |
+| `gco`               | `git checkout`                                             |
+| `main`              | Check out `main` and pull                                  |
+| `develop`           | Check out `develop` and pull                               |
+| `garbageday`        | Delete all local branches except `main`/`master`/`develop` |
+| `lz`                | lazygit`                                                   |
 
 ## Window management
 
@@ -169,13 +170,13 @@ Defined in `shared/.zshrc` (reload with `refresh` after editing):
 in sync so muscle memory carries across machines. Workspaces hold the same class of app on
 both:
 
-| WS | Apps |
-| -- | ---- |
-| 1  | Editor (Cursor / VS Code) |
-| 2  | Chat (Slack, Messages / Discord, WhatsApp) |
-| 3  | Terminal (Ghostty) |
-| 4  | Mail (Proton Mail) |
-| 5  | Music (Spotify) |
+| WS  | Apps                                       |
+| --- | ------------------------------------------ |
+| 1   | Editor (Cursor / VS Code)                  |
+| 2   | Chat (Slack, Messages / Discord, WhatsApp) |
+| 3   | Terminal (Ghostty)                         |
+| 4   | Mail (Proton Mail)                         |
+| 5   | Music (Spotify)                            |
 
 Browsers are intentionally left unassigned on both. Within a workspace, AeroSpace uses
 `alt`+`h`/`j`/`k`/`l` to focus and `alt`+`shift`+`h`/`j`/`k`/`l` to move windows — the mirror
@@ -219,7 +220,7 @@ needs that key or commits will fail outright** — `git commit` aborts with `fai
 commit object` rather than falling back to unsigned. `runs/91-ssh-allowed-signers.sh` writes
 `~/.ssh/allowed_signers` so `git log --show-signature` verifies locally, and warns loudly at
 setup time if the key is missing. For a green "Verified" badge, upload the **same public key
-again** as a *signing* key — a separate entry from the authentication key — in GHE and/or
+again** as a _signing_ key — a separate entry from the authentication key — in GHE and/or
 github.com under Settings → SSH and GPG keys.
 
 ## Node & Yarn versions
@@ -237,25 +238,25 @@ uses that exact version — no manual `yarn set version` needed.
 `setup.sh` resolves the OS, exports `DOTFILES_OS`, then executes every
 executable file in `runs/` in order:
 
-| Script                      | Purpose                                       |
-| --------------------------- | --------------------------------------------- |
-| `00-install-homebrew.sh`    | Bootstrap Homebrew (macOS only)               |
-| `00-install-packages.sh`    | `zsh`, `stow`, `zoxide`                       |
-| `05-brew-bundle.sh`         | Install everything in `Brewfile` (macOS only) |
-| `05-arch-packages.sh`       | Install `packages/arch-packages.txt` (Linux only) |
-| `06-create-code-dir.sh`     | Ensure `~/code` exists                        |
-| `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)               |
-| `20-install-zsh-plugins.sh` | Zsh plugins                                   |
-| `30-install-spaceship.sh`   | Spaceship prompt theme                        |
-| `40-install-nvm.sh`         | `nvm` + Node LTS                              |
-| `50-install-docker.sh`      | Docker CLI, `buildx`, `compose`               |
-| `55-install-ghostty.sh`     | Ghostty terminal                              |
-| `60-install-bun.sh`         | `bun`                                         |
-| `70-install-go.sh`          | `go`                                          |
-| `80-install-lazydocker.sh`  | `lazydocker`                                  |
-| `85-macos-defaults.sh`      | Apply macOS system defaults (macOS only)      |
-| `88-set-default-shell.sh`   | Set `zsh` as the login shell (idempotent)     |
-| `90-stow-home.sh`           | Symlink dotfiles with `stow`                  |
+| Script                      | Purpose                                               |
+| --------------------------- | ----------------------------------------------------- |
+| `00-install-homebrew.sh`    | Bootstrap Homebrew (macOS only)                       |
+| `00-install-packages.sh`    | `zsh`, `stow`, `zoxide`                               |
+| `05-brew-bundle.sh`         | Install everything in `Brewfile` (macOS only)         |
+| `05-arch-packages.sh`       | Install `packages/arch-packages.txt` (Linux only)     |
+| `06-create-code-dir.sh`     | Ensure `~/code` exists                                |
+| `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)                       |
+| `20-install-zsh-plugins.sh` | Zsh plugins                                           |
+| `30-install-spaceship.sh`   | Spaceship prompt theme                                |
+| `40-install-nvm.sh`         | `nvm` + Node LTS                                      |
+| `50-install-docker.sh`      | Docker CLI, `buildx`, `compose`                       |
+| `55-install-ghostty.sh`     | Ghostty terminal                                      |
+| `60-install-bun.sh`         | `bun`                                                 |
+| `70-install-go.sh`          | `go`                                                  |
+| `80-install-lazydocker.sh`  | `lazydocker`                                          |
+| `85-macos-defaults.sh`      | Apply macOS system defaults (macOS only)              |
+| `88-set-default-shell.sh`   | Set `zsh` as the login shell (idempotent)             |
+| `90-stow-home.sh`           | Symlink dotfiles with `stow`                          |
 | `91-ssh-allowed-signers.sh` | Write `~/.ssh/allowed_signers` for SSH commit signing |
 
 Shared helpers (package install, git clone/update, OS detection) live in
@@ -266,11 +267,11 @@ position you want it to run.
 
 Dotfiles are split into three `stow` packages:
 
-| Package   | Contents                                         | Stowed on |
-| --------- | ------------------------------------------------ | --------- |
-| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty config | always |
-| `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS |
-| `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`) | Linux |
+| Package   | Contents                                                                                   | Stowed on |
+| --------- | ------------------------------------------------------------------------------------------ | --------- |
+| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty config                         | always    |
+| `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS     |
+| `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`)                                   | Linux     |
 
 `shared/.zshrc` sources `~/.zshrc.local` if present, so machine- or work-specific aliases
 live in `macos/.zshrc.local` and are only stowed on macOS.
@@ -279,7 +280,7 @@ live in `macos/.zshrc.local` and are only stowed on macOS.
 
 Editor settings are deliberately **not** tracked: Cursor is work-only on a single machine,
 and VS Code on Omarchy uses its own Settings Sync. The `Brewfile` still tracks the VS Code
-extension *list*.
+extension _list_.
 
 The final step stows `shared` plus the package for the detected OS, so macOS never
 symlinks the Hyprland config and Linux never symlinks the AeroSpace config. Before

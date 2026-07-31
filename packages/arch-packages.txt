@@ -18,8 +18,6 @@ openbsd-netcat
 python-pip
 solaar
 stow
-thunderbird
 ttf-cascadia-mono-nerd
 visual-studio-code-bin
-wayfreeze
 zsh
