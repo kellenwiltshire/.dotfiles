@@ -183,10 +183,14 @@ Browsers are intentionally left unassigned on both. Within a workspace, AeroSpac
 of Hyprland's arrow-key navigation (`alt` on macOS ≈ `super` on Linux). Workspace switching
 uses `cmd`+number on macOS and `super`+number on Linux.
 
-Ghostty's own splits sit one level down on `cmd`+`alt`+`h`/`j`/`k`/`l` (the vim twin of its
-built-in `cmd`+`alt`+arrows), with `cmd`+`d` to split and `cmd`+`w` to close. They stay off
-`ctrl` on purpose: `ctrl`+`a`/`d`/`e`/`l`/`x` are readline keys (start of line, EOF, end of
-line, clear, emacs prefix) and Ghostty swallows any key it has bound before the shell sees it.
+Ghostty's own splits sit one level down on `ctrl`+`shift`: `d` to split, `w` to close, `e` to
+equalize, and `h`/`j`/`k`/`l` to move between them. They avoid `cmd`/`super` and bare `ctrl`
+on purpose. Ghostty reads `cmd` as `super`, and on Omarchy Hyprland grabs `super` combos
+compositor-side before the focused app sees them (`super`+`d` opens Discord, `super`+`w`
+closes the window), so anything on `super` works on the Mac and silently dies on Omarchy.
+Bare `ctrl`+`a`/`d`/`e`/`l`/`x` are readline keys (start of line, EOF, end of line, clear,
+emacs prefix) and Ghostty swallows any key it has bound before the shell sees it.
+`ctrl`+`shift` is untouched by both, and is Ghostty's own default modifier on Linux.
 
 ## Cloning repos
 
