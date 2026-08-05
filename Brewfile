@@ -94,6 +94,8 @@ cask "cursor"
 cask "font-sf-mono-nerd-font-ligaturized"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
+# Open-source cross-platform alternative to AirDrop
+cask "localsend"
 # Client for Proton Mail and Proton Calendar
 cask "proton-mail"
 # Control your tools with a few keystrokes

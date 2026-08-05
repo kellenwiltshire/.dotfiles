@@ -2,3 +2,5 @@
 	path = ~/.gitconfig-common
 [user]
 	email = kellen.wiltshire@hootsuite.com
+[http]
+	postBuffer = 524288000
