@@ -157,6 +157,14 @@ alias c="code ."
 alias main="gco main && gl"
 alias develop="gco develop && gl"
 alias lz="lazygit"
+lzw() {
+  local dir="${1:-$PWD}"
+  if [[ "$(uname)" == Darwin ]]; then
+    open -na Ghostty.app --args --working-directory="$dir" -e lazygit
+  else
+    ghostty --working-directory="$dir" -e lazygit &!
+  fi
+}
 
 # Clone into ~/code by default; pass an explicit target (e.g. `.`) to override.
 git() {

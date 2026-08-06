@@ -25,7 +25,7 @@ quick-terminal-animation-duration = 0.1
 # Omarchy and grabs it compositor-side (super+d, super+w) before Ghostty sees it,
 # while ctrl+a/d/e/l/x are readline keys (bol, EOF, eol, clear, emacs prefix) that
 # Ghostty would consume before the shell sees them.
-keybind = ctrl+shift+d=new_split:auto
+keybind = ctrl+shift+d=new_split:right
 keybind = ctrl+shift+w=close_surface
 keybind = ctrl+shift+e=equalize_splits
 keybind = ctrl+shift+h=goto_split:left
