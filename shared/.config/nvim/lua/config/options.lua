@@ -1,0 +1,1 @@
+-- Auto-loaded by LazyVim before lazy.nvim starts, after its own defaults.

@@ -102,7 +102,7 @@ export PATH="$HOME/go/bin:$PATH"
 
 # EDITOR_CMD is the bare command; EDITOR adds --wait for GUI editors so git blocks
 # until the buffer is closed.
-for _candidate in cursor code nvim vim vi; do
+for _candidate in nvim cursor code vim vi; do
   if command -v "$_candidate" >/dev/null; then
     export EDITOR_CMD="$_candidate"
     break
@@ -154,6 +154,7 @@ alias brewdump="~/.dotfiles/scripts/update-brewfile.sh"
 alias pacdump="~/.dotfiles/scripts/update-pacfile.sh"
 alias gco="git checkout"
 alias c="code ."
+alias v="nvim"
 alias main="gco main && gl"
 alias develop="gco develop && gl"
 alias lz="lazygit"

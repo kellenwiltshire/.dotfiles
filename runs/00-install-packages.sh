@@ -24,4 +24,7 @@ if [[ "$(detect_os)" == "linux" ]]; then
   install_package jq
   install_package tldr tealdeer
   install_package btop
+  install_package nvim neovim
+  # nvim-treesitter's main branch shells out to the tree-sitter CLI to build parsers.
+  install_package tree-sitter tree-sitter-cli
 fi

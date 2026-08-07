@@ -1,0 +1,2 @@
+-- Auto-loaded by LazyVim on VeryLazy, after its own default autocmds.
+-- Remove a default group with vim.api.nvim_del_augroup_by_name("lazyvim_<name>").

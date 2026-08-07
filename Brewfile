@@ -55,6 +55,8 @@ brew "lazygit"
 brew "pango"
 # Library to render SVG files using Cairo
 brew "librsvg"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
 # Package compiler and linker metadata toolkit
 brew "pkgconf"
 # Easily download, build, install, upgrade, and uninstall Python packages
@@ -69,6 +71,8 @@ brew "sbt"
 brew "stow"
 # Very fast implementation of tldr in Rust
 brew "tealdeer"
+# Parser generator tool
+brew "tree-sitter-cli"
 # Secures, stores, and tightly controls access to secrets
 brew "vault"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
@@ -91,6 +95,8 @@ brew "hootsuite/homebrew/hs-minikube@2"
 cask "nikitabobko/tap/aerospace"
 # Write, edit, and chat about your code with AI
 cask "cursor"
+# Command-line agent for Cursor
+cask "cursor-cli"
 cask "font-sf-mono-nerd-font-ligaturized"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"

@@ -1,4 +1,4 @@
-## 🛠️ Dotfiles Setup
+# 🛠️ Dotfiles Setup
 
 `setup.sh` is an orchestrator that runs each executable script in `runs/` (in
 filename order) and then symlinks the dotfiles into your home directory with `stow`.
@@ -6,7 +6,7 @@ filename order) and then symlinks the dotfiles into your home directory with `st
 Every step is idempotent — rerunning the setup updates or skips anything that is
 already installed instead of failing.
 
-### What gets installed
+## What gets installed
 
 On macOS, `Brewfile` is the source of truth for CLI tools, GUI apps (AeroSpace, Cursor,
 VS Code, Ghostty, Raycast, Spotify, Proton Mail), fonts, and VS Code extensions. After
@@ -35,11 +35,14 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 - [Ghostty](https://ghostty.org/) terminal (set as default on Linux)
 - `bun`
 - `go`
+- [Cursor CLI](https://cursor.com/docs/cli) (`cursor-agent`) — macOS only; the `cursor-cli`
+  cask is `depends_on :macos`, so there's no Linux equivalent in `arch-packages.txt`
+- [Neovim](https://neovim.io/) — config layout is [below](#neovim)
 
 On Linux these modern CLI tools are installed by `runs/00-install-packages.sh` for parity, so
 the shared `zsh`/`git` config never points at a missing binary.
 
-### Updating
+## Updating
 
 Re-running `./setup.sh brew-bundle` does **not** upgrade anything — it runs with
 `--no-upgrade` and only installs what's missing. To update everything installed via
@@ -120,7 +123,7 @@ Each step picks the right package manager automatically (`brew`, `apt`, `dnf`, o
 `setup.sh` handles system defaults, the login shell, tools, and symlinks. A few things
 still need a human:
 
-**Both OSes**
+### Both OSes
 
 - Reload your shell (`refresh`) or log out/in — some changes (login shell, macOS key
   repeat) only apply after that.
@@ -130,7 +133,7 @@ still need a human:
   `./setup.sh ssh-allowed-signers` so local verification picks it up.
 - Sign in to apps and browsers.
 
-**macOS**
+### macOS
 
 - Grant **AeroSpace** Accessibility permission (System Settings → Privacy & Security →
   Accessibility), or it can't move windows.
@@ -138,7 +141,7 @@ still need a human:
 - For Hootsuite tooling: run `hs-dotfiles-init` to auth the private `hootsuite/homebrew`
   tap, then `./setup.sh brew-bundle` to finish installing those formulae.
 
-**Linux (Omarchy)**
+### Linux (Omarchy)
 
 - Log out/in for the `zsh` login-shell change to take effect.
 - Relaunch Hyprland (Super+Esc → Relaunch) to apply the stowed config.
@@ -154,6 +157,7 @@ Defined in `shared/.zshrc` (reload with `refresh` after editing):
 | `refresh`           | Reload `~/.zshrc`                                          |
 | `dots`              | Open this dotfiles repo in `$EDITOR_CMD`                   |
 | `c`                 | Open the current directory in VS Code                      |
+| `v`                 | `nvim`                                                     |
 | `ls`/`ll`/`la`/`lt` | `eza` listings (plain / long / long+hidden / tree)         |
 | `brewup`            | Update Homebrew and upgrade + clean up everything          |
 | `brewdump`          | Refresh `Brewfile` from the current Homebrew state         |
@@ -192,6 +196,121 @@ Bare `ctrl`+`a`/`d`/`e`/`l`/`x` are readline keys (start of line, EOF, end of li
 emacs prefix) and Ghostty swallows any key it has bound before the shell sees it.
 `ctrl`+`shift` is untouched by both, and is Ghostty's own default modifier on Linux.
 
+## Neovim
+
+The config lives in `shared/`, so the two machines are identical and nothing depends on
+Omarchy — which matters because Omarchy ships its own `neovim` and `omarchy-nvim` (a
+pre-warmed LazyVim), and either can change upstream without warning.
+
+Built on the [LazyVim](https://lazyvim.org) starter. The repo tracks only the user layer —
+`init.lua`, `lua/config/`, `lua/plugins/` — because LazyVim itself is a _plugin_ that
+`lazy.nvim` fetches into `~/.local/share/nvim`. Two generated files are tracked alongside it:
+`lazy-lock.json` pins every plugin to an exact commit, and `lazyvim.json` records which
+[Extras](https://www.lazyvim.org/extras) are enabled, which is the only reason a fresh machine
+gets the Go, TypeScript, Markdown and other language layers.
+
+`:Lazy update` and `:LazyExtras` write those files through the `stow` symlink straight into
+this repo and leave them **uncommitted**, the same review-then-commit loop `brewdump` uses for
+the `Brewfile`. `runs/92-nvim-bootstrap.sh` replays them so a fresh machine lands on the
+identical set without a manual first launch. It runs after `90-stow-home.sh` because it needs
+the config symlinked first.
+
+**On a new machine** the bootstrap runs in two phases, because `Lazy! restore` only covers
+plugins. Language servers, linters and formatters come from Mason, and treesitter parsers are
+compiled locally; neither is in the lockfile. `scripts/nvim-install-tools.lua` reads the tool
+list out of the resolved LazyVim config and installs both, blocking until they finish. Without
+it the first launch is a half-built editor that fills itself in per filetype as you open files.
+Budget a few minutes for roughly 27 Mason packages and 36 parsers. Compiling parsers shells
+out to the `tree-sitter` CLI, so that is a real system dependency — `tree-sitter-cli` in the
+`Brewfile` and in `runs/00-install-packages.sh` — and the script refuses to start without it
+rather than failing halfway. `Could not rename temp: ENOTEMPTY` errors in the first phase are
+expected: `Lazy!` starts parser builds and `+qa` kills them partway through, so the second
+phase retries whatever is missing and fails only if a parser is still absent afterwards.
+
+Mason is the one place the two machines can drift. It has no lockfile, so plugins are pinned to
+a commit while tool versions are whatever the registry served on the day.
+
+Beyond the language layers, the enabled extras are `dap.core`, `test.core`, `ai.sidekick`,
+`util.octo`, `coding.mini-surround`, `ui.treesitter-context` and `editor.inc-rename`. Two need
+local overrides, which is all `lua/plugins/` holds besides the theme. `ai.lua` disables
+Sidekick's Next Edit Suggestions, because those need a Copilot subscription and enabling them
+also starts a `copilot` LSP client; the half that is used is the CLI terminal, which drives the
+`cursor-agent` binary from the `cursor-cli` cask. `test.lua` adds the jest, vitest and
+Playwright adapters, because `test.core` ships neotest with no JavaScript adapter at all.
+Debugging needs no override — `lang.typescript` already registers the node and chrome adapters
+and reads `.vscode/launch.json`, so existing launch configs work untouched.
+
+### Keys worth remembering
+
+All LazyVim defaults, with `<leader>` being space. When a binding won't come to mind, press
+`<leader>` alone for the which-key menu, or `<leader>sk` to search every keymap.
+
+| Keys                                       | Does                                                  |
+| ------------------------------------------ | ----------------------------------------------------- |
+| `<leader>sk` / `<leader>?`                 | Search all keymaps / only this buffer's               |
+| `s` / `S`                                  | Jump to any two characters on screen / a syntax node  |
+| `]d` / `[d`                                | Next / previous diagnostic                            |
+| `<leader>cd` / `<leader>xx`                | Diagnostic on this line / all of them in Trouble      |
+| `<leader>cf`                               | Format the buffer                                     |
+| `<leader>uf` / `<leader>uF`                | Toggle format-on-save globally / for this buffer      |
+| `<leader>ud`                               | Turn diagnostics off                                  |
+| `<leader>cr`                               | Rename a symbol, with live preview                    |
+| `gsa` / `gsd` / `gsr`                      | Add / delete / replace surrounding quotes or brackets |
+| `<leader>tr` / `<leader>tt`                | Run the nearest test / every test in the file         |
+| `<leader>ts` / `<leader>tw`                | Test summary panel / watch mode                       |
+| `<leader>td`                               | Debug the nearest test                                |
+| `<leader>db` / `<leader>dc`                | Toggle a breakpoint / start or continue               |
+| `<leader>di` / `<leader>dO` / `<leader>do` | Step into / over / out                                |
+| `<leader>aa` / `ctrl`+`.`                  | Toggle the AI CLI panel / jump into it                |
+| `<leader>at` / `<leader>av`                | Send the thing under the cursor / the selection       |
+| `<leader>gp` / `<leader>gi`                | List PRs / issues without leaving the editor          |
+
+When something looks wrong: `:LazyHealth` and `:checkhealth` for the broad picture,
+`:checkhealth vim.lsp` for a language server that won't attach (`:LspInfo` no longer exists),
+`:ConformInfo` for a formatter that isn't running, `:Mason` for a missing tool, `:Lazy` for a
+plugin, and `:LazyExtras` to turn a layer on or off — which rewrites `lazyvim.json`, so it
+needs committing afterwards.
+
+### Learning the motions
+
+`:Tutor` is the thirty-minute interactive tutorial built into Neovim, and it is the right
+starting point. The LazyVim starter disables it by listing `tutor` in
+`performance.rtp.disabled_plugins`; that line has been removed here, so the command works.
+
+The leverage isn't in memorising bindings, it's in the grammar: an **operator** (`c` change,
+`d` delete, `y` yank, `v` select) takes a **selector** (`i` inner, `a` around) and a **text
+object**. Fifteen or so keys therefore cover several hundred edits. `mini.ai` and
+`nvim-treesitter-textobjects` add the syntax-aware objects, which is where most of the value is
+for TypeScript:
+
+| Object                | Selects                                              |
+| --------------------- | ---------------------------------------------------- |
+| `f`                   | A function — `caf` replaces one, `cif` just its body |
+| `u`                   | A function call, name and arguments together         |
+| `t`                   | An HTML or JSX tag — `cit` swaps the contents        |
+| `o`                   | The nearest block, conditional or loop               |
+| `c`                   | A class                                              |
+| `e`                   | One camelCase segment of an identifier               |
+| `w` / `p` / `"` / `(` | Word, paragraph, quotes, brackets                    |
+
+`hardtime.nvim` handles the habit side. It is set to `restriction_mode = "hint"`, so pressing
+`j` five times in a row prints the motion that would have been shorter rather than swallowing
+the keypress; arrow keys and the mouse are deliberately left working, unlike its defaults.
+`<leader>uH` toggles it and `:Hardtime report` shows what you've been leaning on.
+
+`:h motion.txt` and `:h text-objects` are the real references once the shape makes sense.
+
+The colourscheme is Night Owl, matching Ghostty and the VS Code extension. Note that
+`night-owl.nvim` never sets `g:colors_name`, so that variable reads `nil` even when the
+theme is applied — check a highlight group instead.
+
+**On Omarchy**, `omarchy-nvim` owns `~/.config/nvim` and pre-warms `~/.local/share/nvim`
+with plugins that won't match our lockfile. Stow backs up each config file it replaces, and
+the bootstrap script moves the data directory aside once (guarded by a marker file) so
+`lazy.nvim` rebuilds cleanly. Leave the `omarchy-nvim` package installed — it's in Omarchy's
+base set. If an `omarchy-update` migration ever re-runs `omarchy-nvim-setup`, it prompts
+before overwriting, and `./setup.sh stow-home` puts things back.
+
 ## Cloning repos
 
 Setup creates `~/code`, and `shared/.zshrc` wraps `git` so a bare clone lands there:
@@ -211,9 +330,9 @@ four lines each — the include plus one email — so a setting can't drift betw
 
 ```ini
 [include]
-	path = ~/.gitconfig-common
+ path = ~/.gitconfig-common
 [user]
-	email = kellen.wiltshire@hootsuite.com   # macOS (work machine)
+ email = kellen.wiltshire@hootsuite.com   # macOS (work machine)
 ```
 
 The Mac only ever holds work repos, so it uses the Hootsuite identity everywhere with no
@@ -262,6 +381,7 @@ executable file in `runs/` in order:
 | `88-set-default-shell.sh`   | Set `zsh` as the login shell (idempotent)             |
 | `90-stow-home.sh`           | Symlink dotfiles with `stow`                          |
 | `91-ssh-allowed-signers.sh` | Write `~/.ssh/allowed_signers` for SSH commit signing |
+| `92-nvim-bootstrap.sh`      | Neovim plugins, Mason tools, treesitter parsers       |
 
 Shared helpers (package install, git clone/update, OS detection) live in
 `scripts/lib.sh`. To add a step, drop an executable script in `runs/` named with the
@@ -273,7 +393,7 @@ Dotfiles are split into three `stow` packages:
 
 | Package   | Contents                                                                                   | Stowed on |
 | --------- | ------------------------------------------------------------------------------------------ | --------- |
-| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty config                         | always    |
+| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty and Neovim config              | always    |
 | `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS     |
 | `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`)                                   | Linux     |
 
@@ -282,9 +402,9 @@ live in `macos/.zshrc.local` and are only stowed on macOS.
 
 `.ssh/config` lives in `macos/` rather than `shared/` because it uses Apple's `UseKeychain`.
 
-Editor settings are deliberately **not** tracked: Cursor is work-only on a single machine,
-and VS Code on Omarchy uses its own Settings Sync. The `Brewfile` still tracks the VS Code
-extension _list_.
+GUI editor settings are deliberately **not** tracked: Cursor is work-only on a single
+machine, and VS Code on Omarchy uses its own Settings Sync. The `Brewfile` still tracks the
+VS Code extension _list_. Neovim is the exception — see [Neovim](#neovim).
 
 The final step stows `shared` plus the package for the detected OS, so macOS never
 symlinks the Hyprland config and Linux never symlinks the AeroSpace config. Before
