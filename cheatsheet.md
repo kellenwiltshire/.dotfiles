@@ -73,6 +73,7 @@ shell. Keys marked *no prefix* are pressed directly.
 
 | Keys | Does |
 | --- | --- |
+| `cmd`+`return` / `super`+`return` | Terminal on workspace 1 — activates it on macOS, new window on Omarchy |
 | `ctrl`+`f` | Sessionizer — pick a project, from any shell |
 | `prefix` + `f` | Sessionizer, from inside tmux |
 | `tmux-sessionizer <dir>` | Jump straight to a directory, skipping the picker |

@@ -12,6 +12,9 @@ background-opacity = 0.95
 
 font-size = 12
 
+# Per-OS overrides, stowed from macos/ or linux/. Loaded last, so it wins.
+config-file = ?config-local
+
 # -----------------------------------------------------------------------------
 
 # Quake Mode Configuration

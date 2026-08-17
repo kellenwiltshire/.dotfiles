@@ -130,19 +130,19 @@ still need a human:
 ## Window management
 
 [AeroSpace](https://github.com/nikitabobko/AeroSpace) (macOS) and Hyprland (Omarchy) share
-navigation habits, but only macOS pins apps to workspaces. `macos/.aerospace.toml` assigns:
+navigation habits. `macos/.aerospace.toml` assigns:
 
-| WS  | Apps                      |
-| --- | ------------------------- |
-| 1   | Editor (Cursor / VS Code) |
-| 2   | Chat (Slack, Messages)    |
-| 3   | Terminal (Ghostty)        |
-| 4   | Mail (Proton Mail)        |
-| 5   | Music (Spotify)           |
+| WS  | Apps                   |
+| --- | ---------------------- |
+| 1   | Terminal (Ghostty)     |
+| 2   | Chat (Slack, Messages) |
+| 4   | Mail (Proton Mail)     |
+| 5   | Music (Spotify)        |
 
-Browsers are intentionally left unassigned. Omarchy deliberately runs stock Hyprland
-defaults — see [Hyprland config](#hyprland-config) — so Linux has no equivalent
-auto-assignment; windows open wherever you launch them.
+Nothing claims 3. Browsers are unassigned on purpose, and so is the editor — Neovim runs
+inside tmux on workspace 1. Linux mirrors only the workspace 1 rule (`o.window` at the
+bottom of `linux/.config/hypr/hyprland.lua`); everything else opens wherever you launch it,
+per Omarchy's stock defaults — see [Hyprland config](#hyprland-config).
 
 Within a workspace, AeroSpace uses `alt`+`h`/`j`/`k`/`l` to focus and
 `alt`+`shift`+`h`/`j`/`k`/`l` to move windows — the mirror of Hyprland's arrow-key navigation
@@ -158,6 +158,31 @@ on Omarchy.
 Bare `ctrl`+`a`/`d`/`e`/`l`/`x` are readline keys (start of line, EOF, end of line, clear,
 emacs prefix) and Ghostty swallows any key it has bound before the shell sees it.
 `ctrl`+`shift` is untouched by both, and is Ghostty's own default modifier on Linux.
+
+### Terminal on workspace 1
+
+A terminal is started at login on both machines — `after-startup-command` in
+`.aerospace.toml`, `o.launch_on_start` in `hypr/autostart.lua` — and the window rules above
+put it on workspace 1. tmux is not started for you: attach with `ctrl`+`f`
+(the [sessionizer](#sessionizer)) or plain `tmux`.
+
+`cmd`+`Return` gets you back to it on macOS, mirroring Omarchy's stock `super`+`Return`,
+which needs no override. The two behave slightly differently: `super`+`Return` opens another
+Ghostty window, while `cmd`+`Return` runs `open -a Ghostty.app`, which activates the running
+one — and AeroSpace follows the focus to workspace 1. Use Ghostty's own `cmd`+`n` for an
+extra window on macOS.
+
+macOS has no equivalent of `ghostty -e <command>`, which is why the terminal starts bare
+there. `open -na Ghostty.app --args -e …` is the documented substitute, but `-n` forks a
+second Ghostty instance and reliably leaves a stray shell window behind it.
+
+### Ghostty font size
+
+`shared/.config/ghostty/config` ends with `config-file = ?config-local`, and
+`macos/.config/ghostty/config-local` raises `font-size` from 12 to 16 so the Mac's retina
+panel matches the apparent size of the Omarchy laptop. Includes are loaded after the file
+that references them, so the override wins wherever it sits, and the leading `?` keeps
+Ghostty quiet on Linux where that file is never stowed.
 
 ## tmux
 
@@ -370,11 +395,11 @@ position you want it to run.
 
 Dotfiles are split into three `stow` packages:
 
-| Package   | Contents                                                                                   | Stowed on |
-| --------- | ------------------------------------------------------------------------------------------ | --------- |
-| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty, tmux, Neovim, `.local/bin`    | always    |
-| `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS     |
-| `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`)                                   | Linux     |
+| Package   | Contents                                                                                                           | Stowed on |
+| --------- | ------------------------------------------------------------------------------------------------------------------ | --------- |
+| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty, tmux, Neovim, `.local/bin`                            | always    |
+| `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases), Ghostty `config-local` | macOS     |
+| `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`)                                                           | Linux     |
 
 `shared/.zshrc` sources `~/.zshrc.local` if present, so machine- or work-specific aliases
 live in `macos/.zshrc.local` and are only stowed on macOS.

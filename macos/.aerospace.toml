@@ -1,6 +1,6 @@
 after-login-command = []
 
-after-startup-command = []
+after-startup-command = ['exec-and-forget open -a Ghostty.app']
 
 start-at-login = true
 
@@ -59,6 +59,10 @@ alt-shift-j = 'move down'
 alt-shift-k = 'move up'
 alt-shift-l = 'move right'
 
+# Mirrors Omarchy's SUPER+RETURN terminal binding. `open -a` activates the running
+# Ghostty, or starts it when nothing is up; -n would fork a second instance.
+cmd-enter = 'exec-and-forget open -a Ghostty.app'
+
 cmd-1 = 'workspace 1'
 cmd-2 = 'workspace 2'
 cmd-3 = 'workspace 3'
@@ -93,16 +97,12 @@ r = ['flatten-workspace-tree', 'mode main']
 #
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'Code - Insiders|Cursor|VSCode'
-run = ['layout tiling', 'move-node-to-workspace 1']
+if.app-name-regex-substring = 'Ghostty'
+run = ['layout tiling', 'move-node-to-workspace 1 --focus-follows-window']
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Slack|Messages'
 run = ['layout tiling', 'move-node-to-workspace 2']
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Ghostty'
-run = ['layout tiling', 'move-node-to-workspace 3']
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Proton'

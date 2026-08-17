@@ -1,0 +1,4 @@
+# macOS-only overrides on top of shared/.config/ghostty/config.
+
+# Retina panels need 4pt more than the Omarchy laptop to match apparent size.
+font-size = 16

@@ -27,3 +27,6 @@ require("default.hypr.toggles")
 
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
+
+-- Terminal lives on workspace 1, matching AeroSpace on macOS.
+o.window("com.mitchellh.ghostty", { workspace = "1" })
