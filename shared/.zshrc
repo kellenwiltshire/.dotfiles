@@ -100,6 +100,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Go (binaries installed via `go install`)
 export PATH="$HOME/go/bin:$PATH"
 
+# Stowed personal scripts, e.g. tmux-sessionizer
+export PATH="$HOME/.local/bin:$PATH"
+
 # EDITOR_CMD is the bare command; EDITOR adds --wait for GUI editors so git blocks
 # until the buffer is closed.
 for _candidate in nvim cursor code vim vi; do
@@ -212,6 +215,10 @@ if command -v fd >/dev/null; then
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 fi
+
+# Jump to a project session from a bare shell. Set after fzf's own bindings so it wins.
+# This takes C-f from forward-char; use the right arrow to move a character.
+command -v tmux-sessionizer >/dev/null && bindkey -s '^f' 'tmux-sessionizer\n'
 
 if command -v eza >/dev/null; then
   alias ls='eza --group-directories-first'

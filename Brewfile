@@ -71,6 +71,8 @@ brew "sbt"
 brew "stow"
 # Very fast implementation of tldr in Rust
 brew "tealdeer"
+# Terminal multiplexer
+brew "tmux"
 # Parser generator tool
 brew "tree-sitter-cli"
 # Secures, stores, and tightly controls access to secrets

@@ -21,7 +21,7 @@ baseline="$(mktemp)"
 explicit="$(mktemp)"
 trap 'rm -f "$baseline" "$explicit"' EXIT
 
-omarchy_install="$HOME/.local/share/omarchy/install"
+omarchy_install="${OMARCHY_PATH:-/usr/share/omarchy}/install"
 if [[ -d "$omarchy_install" ]]; then
   cat "$omarchy_install"/omarchy-base.packages "$omarchy_install"/omarchy-other.packages 2>/dev/null \
     | grep -vE '^\s*(#|$)' | sort -u > "$baseline"
@@ -29,6 +29,18 @@ else
   echo "⚠️  Omarchy manifests not found at $omarchy_install."
   echo "   Writing all explicit packages (no baseline to subtract)."
 fi
+
+# Omarchy marks its own meta packages explicit, but they aren't in the manifests,
+# so they'd otherwise show up as things you added. Reinstalling them on a restore
+# is wrong: they're the OS, already present before setup.sh ever runs.
+cat >> "$baseline" <<'META'
+omarchy
+omarchy-dev
+omarchy-keyring
+omarchy-settings
+omarchy-settings-dev
+META
+sort -u -o "$baseline" "$baseline"
 
 pacman -Qqe | sort -u > "$explicit"
 

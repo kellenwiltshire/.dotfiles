@@ -6,6 +6,9 @@ filename order) and then symlinks the dotfiles into your home directory with `st
 Every step is idempotent — rerunning the setup updates or skips anything that is
 already installed instead of failing.
 
+**Looking for a command or a keybinding?** See the [cheatsheet](cheatsheet.md). This file
+explains why things are set up the way they are.
+
 ## What gets installed
 
 On macOS, `Brewfile` is the source of truth for CLI tools, GUI apps (AeroSpace, Cursor,
@@ -33,6 +36,7 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 - Docker tooling: CLI, `buildx`, `compose`
 - `lazydocker`
 - [Ghostty](https://ghostty.org/) terminal (set as default on Linux)
+- `tmux` — config and sessionizer are [below](#tmux)
 - `bun`
 - `go`
 - [Cursor CLI](https://cursor.com/docs/cli) (`cursor-agent`) — macOS only; the `cursor-cli`
@@ -45,12 +49,8 @@ the shared `zsh`/`git` config never points at a missing binary.
 ## Updating
 
 Re-running `./setup.sh brew-bundle` does **not** upgrade anything — it runs with
-`--no-upgrade` and only installs what's missing. To update everything installed via
-Homebrew, use the `brewup` alias:
-
-```bash
-brewup   # brew update && brew upgrade && brew cleanup
-```
+`--no-upgrade` and only installs what's missing. Use the `brewup` alias to actually update
+everything Homebrew installed.
 
 `brew upgrade` skips casks that update themselves (Cursor, Docker, Chrome, …). Add
 `--greedy` to force those too, though it's rarely needed.
@@ -69,12 +69,9 @@ The Linux equivalent of the `Brewfile` is `packages/arch-packages.txt`. It track
 packages **you added on top of Omarchy's defaults**, not Omarchy's full base set.
 
 `pacdump` computes that by taking your explicitly-installed packages (`pacman -Qqe`) and
-subtracting Omarchy's canonical manifests
-(`~/.local/share/omarchy/install/omarchy-base.packages` and `omarchy-other.packages`):
-
-```bash
-pacdump   # writes packages/arch-packages.txt, then review + commit the diff
-```
+subtracting Omarchy's canonical manifests (`omarchy-base.packages` and
+`omarchy-other.packages`, found under `$OMARCHY_PATH/install`, normally
+`/usr/share/omarchy/install`).
 
 On a new Omarchy machine, install Omarchy first (which restores the base set), then
 `setup.sh` runs `runs/05-arch-packages.sh`, which installs everything in the list with
@@ -86,37 +83,18 @@ Notes:
 - Version pinning isn't used; you get whatever the current mirrors/AUR serve.
 - Run this on a real Omarchy box — the manifests only exist there. Off Omarchy (e.g. plain
   Arch) `pacdump` falls back to listing all explicit packages, since there's no baseline.
+- The `omarchy*` meta packages are subtracted too. Omarchy marks them explicit but doesn't
+  list them in the manifests, so they'd otherwise look like something you added — and
+  reinstalling the OS from a dotfiles restore is not the goal.
 
 ## Usage
 
-Clone the repo, `cd` into it, and run:
+Clone the repo, `cd` into it, and run `./setup.sh`. When it finishes, refresh `~/.zshrc`.
 
-```bash
-./setup.sh
-```
-
-When it finishes, refresh `~/.zshrc`.
-
-### Run a subset
-
-Pass a filter to only run scripts whose path matches it:
-
-```bash
-./setup.sh plugins   # runs runs/20-install-zsh-plugins.sh only
-./setup.sh docker    # runs the docker-related scripts
-```
-
-### Operating system
-
-The OS is auto-detected with `uname` and defaults to Linux. Force macOS if needed:
-
-```bash
-./setup.sh --macos   # or -m
-./setup.sh --linux   # or -l
-```
-
-Each step picks the right package manager automatically (`brew`, `apt`, `dnf`, or
-`pacman`), so the same command works on Linux and macOS.
+A filter argument runs only the steps whose path matches it, and `--macos`/`--linux` override
+the `uname` detection — see the [cheatsheet](cheatsheet.md#dotfiles-maintenance). Each step
+picks the right package manager automatically (`brew`, `apt`, `dnf`, or `pacman`), so the same
+command works on both machines.
 
 ## Manual steps after setup
 
@@ -145,56 +123,99 @@ still need a human:
 
 - Log out/in for the `zsh` login-shell change to take effect.
 - Relaunch Hyprland (Super+Esc → Relaunch) to apply the stowed config.
-- Edit `linux/.config/hypr/monitors.conf` and the NVIDIA env vars in `hyprland.conf` if
-  the machine's hardware differs.
-
-## Handy aliases
-
-Defined in `shared/.zshrc` (reload with `refresh` after editing):
-
-| Alias               | Does                                                       |
-| ------------------- | ---------------------------------------------------------- |
-| `refresh`           | Reload `~/.zshrc`                                          |
-| `dots`              | Open this dotfiles repo in `$EDITOR_CMD`                   |
-| `c`                 | Open the current directory in VS Code                      |
-| `v`                 | `nvim`                                                     |
-| `ls`/`ll`/`la`/`lt` | `eza` listings (plain / long / long+hidden / tree)         |
-| `brewup`            | Update Homebrew and upgrade + clean up everything          |
-| `brewdump`          | Refresh `Brewfile` from the current Homebrew state         |
-| `pacdump`           | Refresh `packages/arch-packages.txt` (Linux/Omarchy)       |
-| `gco`               | `git checkout`                                             |
-| `main`              | Check out `main` and pull                                  |
-| `develop`           | Check out `develop` and pull                               |
-| `garbageday`        | Delete all local branches except `main`/`master`/`develop` |
-| `lz`                | lazygit`                                                   |
+- Edit `linux/.config/hypr/monitors.lua` if the machine's hardware differs. NVIDIA no longer
+  needs anything here: Omarchy 4.0 detects the GPU and sets the env vars in
+  `default/hypr/nvidia.lua`.
 
 ## Window management
 
-[AeroSpace](https://github.com/nikitabobko/AeroSpace) (macOS) and Hyprland (Omarchy) are kept
-in sync so muscle memory carries across machines. Workspaces hold the same class of app on
-both:
+[AeroSpace](https://github.com/nikitabobko/AeroSpace) (macOS) and Hyprland (Omarchy) share
+navigation habits, but only macOS pins apps to workspaces. `macos/.aerospace.toml` assigns:
 
-| WS  | Apps                                       |
-| --- | ------------------------------------------ |
-| 1   | Editor (Cursor / VS Code)                  |
-| 2   | Chat (Slack, Messages / Discord, WhatsApp) |
-| 3   | Terminal (Ghostty)                         |
-| 4   | Mail (Proton Mail)                         |
-| 5   | Music (Spotify)                            |
+| WS  | Apps                      |
+| --- | ------------------------- |
+| 1   | Editor (Cursor / VS Code) |
+| 2   | Chat (Slack, Messages)    |
+| 3   | Terminal (Ghostty)        |
+| 4   | Mail (Proton Mail)        |
+| 5   | Music (Spotify)           |
 
-Browsers are intentionally left unassigned on both. Within a workspace, AeroSpace uses
-`alt`+`h`/`j`/`k`/`l` to focus and `alt`+`shift`+`h`/`j`/`k`/`l` to move windows — the mirror
-of Hyprland's arrow-key navigation (`alt` on macOS ≈ `super` on Linux). Workspace switching
-uses `cmd`+number on macOS and `super`+number on Linux.
+Browsers are intentionally left unassigned. Omarchy deliberately runs stock Hyprland
+defaults — see [Hyprland config](#hyprland-config) — so Linux has no equivalent
+auto-assignment; windows open wherever you launch them.
+
+Within a workspace, AeroSpace uses `alt`+`h`/`j`/`k`/`l` to focus and
+`alt`+`shift`+`h`/`j`/`k`/`l` to move windows — the mirror of Hyprland's arrow-key navigation
+(`alt` on macOS ≈ `super` on Linux). Workspace switching uses `cmd`+number on macOS and
+`super`+number on Linux.
 
 Ghostty's own splits sit one level down on `ctrl`+`shift`: `d` to split, `w` to close, `e` to
 equalize, and `h`/`j`/`k`/`l` to move between them. They avoid `cmd`/`super` and bare `ctrl`
 on purpose. Ghostty reads `cmd` as `super`, and on Omarchy Hyprland grabs `super` combos
-compositor-side before the focused app sees them (`super`+`d` opens Discord, `super`+`w`
-closes the window), so anything on `super` works on the Mac and silently dies on Omarchy.
+compositor-side before the focused app sees them (`super`+`w` closes the window,
+`super`+`v` pastes from history), so anything on `super` works on the Mac and silently dies
+on Omarchy.
 Bare `ctrl`+`a`/`d`/`e`/`l`/`x` are readline keys (start of line, EOF, end of line, clear,
 emacs prefix) and Ghostty swallows any key it has bound before the shell sees it.
 `ctrl`+`shift` is untouched by both, and is Ghostty's own default modifier on Linux.
+
+## tmux
+
+`shared/.config/tmux/tmux.conf` is used on both machines. It starts from the `tmux.conf`
+Omarchy ships — which is well tuned, and worth diffing against
+`$OMARCHY_PATH/config/tmux/tmux.conf` after an Omarchy update — and layers
+[ThePrimeagen's](https://github.com/ThePrimeagen/.dotfiles) prefix, pane keys and sessionizer
+on top.
+
+Deliberately **not** taken from his config: `xclip` for yanking (X11-only, so it is dead on
+both Wayland and macOS — Omarchy's `set-clipboard on` uses OSC 52 and works on both),
+`screen-256color` (loses true colour and undercurl in Neovim), and his bindings into his own
+repos.
+
+### Sessionizer
+
+`shared/.local/bin/tmux-sessionizer` fuzzy-picks a project and attaches a session named after
+it, creating one on first use and reusing it forever after. It's on `C-f` from any shell and
+`prefix` + `f` inside tmux — see the [cheatsheet](cheatsheet.md#sessions).
+
+It is a port of Prime's script with one bug fixed: his ends unconditionally in
+`switch-client`, which fails with "no current client" when run from a bare shell while a tmux
+server is already running. This version attaches when outside tmux and switches when inside.
+
+### Keys that moved
+
+Two of Omarchy's prefix keys had to move to make room for Prime's `h`/`j`/`k`/`l` pane
+navigation: `prefix` + `h` was a split and `prefix` + `k` was kill-window, so kill-window is
+now `prefix` + `X` and the splits moved to `|` and `-`. Everything else Omarchy bound is
+untouched, including the no-prefix `M-Enter` splits, `C-M-arrows`, and `M-1`…`M-9`.
+
+Two keys leave the shell as a result. The `C-a` prefix takes readline's start-of-line, though
+`prefix` + `a` sends a literal one, and `C-f` becomes the sessionizer instead of
+`forward-char`. `C-b` is unbound entirely.
+
+## Hyprland config
+
+Omarchy 4.0 moved Hyprland config from `.conf` to Lua. `~/.config/hypr/*.lua` are user entry
+points that load Omarchy's defaults first, so they only need to hold overrides.
+
+All of them are tracked in `linux/.config/hypr/`, including the ones that are still byte-for-byte
+Omarchy stock. That's deliberate: editing a file in place is then always enough, with no step
+where you have to remember to copy it into the repo first. Only `monitors.lua` currently differs
+from stock — it pins the Samsung ultrawide to `DP-1` at 120Hz, because that isn't the panel's
+preferred mode, and leaves a `preferred`/`auto` catch-all for any other display.
+
+`omarchy-refresh-hyprland` pulls in improved upstream defaults after an Omarchy update. It
+writes _through_ the stow symlinks, so the result lands in this repo as a reviewable
+`git diff`. It also refreshes `monitors.lua`, so re-apply the monitor block afterwards.
+
+Two things to know:
+
+- `super`+`/` (monitor scaling) persists the new scale by running `sed -i` on `monitors.lua`,
+  which **replaces the symlink with a real file** and silently detaches it from the repo.
+  `./setup.sh stow-home` relinks it.
+- Idle and lock timings are no longer Hyprland's business. 4.0 retired `hypridle`, `hyprlock`,
+  and `waybar` in favour of `omarchy-shell`, which reads `idle.screensaver` and `idle.lock`
+  (seconds) from `~/.config/omarchy/shell.json`. That file is currently untracked.
 
 ## Neovim
 
@@ -240,36 +261,9 @@ Playwright adapters, because `test.core` ships neotest with no JavaScript adapte
 Debugging needs no override — `lang.typescript` already registers the node and chrome adapters
 and reads `.vscode/launch.json`, so existing launch configs work untouched.
 
-### Keys worth remembering
-
-All LazyVim defaults, with `<leader>` being space. When a binding won't come to mind, press
-`<leader>` alone for the which-key menu, or `<leader>sk` to search every keymap.
-
-| Keys                                       | Does                                                  |
-| ------------------------------------------ | ----------------------------------------------------- |
-| `<leader>sk` / `<leader>?`                 | Search all keymaps / only this buffer's               |
-| `s` / `S`                                  | Jump to any two characters on screen / a syntax node  |
-| `]d` / `[d`                                | Next / previous diagnostic                            |
-| `<leader>cd` / `<leader>xx`                | Diagnostic on this line / all of them in Trouble      |
-| `<leader>cf`                               | Format the buffer                                     |
-| `<leader>uf` / `<leader>uF`                | Toggle format-on-save globally / for this buffer      |
-| `<leader>ud`                               | Turn diagnostics off                                  |
-| `<leader>cr`                               | Rename a symbol, with live preview                    |
-| `gsa` / `gsd` / `gsr`                      | Add / delete / replace surrounding quotes or brackets |
-| `<leader>tr` / `<leader>tt`                | Run the nearest test / every test in the file         |
-| `<leader>ts` / `<leader>tw`                | Test summary panel / watch mode                       |
-| `<leader>td`                               | Debug the nearest test                                |
-| `<leader>db` / `<leader>dc`                | Toggle a breakpoint / start or continue               |
-| `<leader>di` / `<leader>dO` / `<leader>do` | Step into / over / out                                |
-| `<leader>aa` / `ctrl`+`.`                  | Toggle the AI CLI panel / jump into it                |
-| `<leader>at` / `<leader>av`                | Send the thing under the cursor / the selection       |
-| `<leader>gp` / `<leader>gi`                | List PRs / issues without leaving the editor          |
-
-When something looks wrong: `:LazyHealth` and `:checkhealth` for the broad picture,
-`:checkhealth vim.lsp` for a language server that won't attach (`:LspInfo` no longer exists),
-`:ConformInfo` for a formatter that isn't running, `:Mason` for a missing tool, `:Lazy` for a
-plugin, and `:LazyExtras` to turn a layer on or off — which rewrites `lazyvim.json`, so it
-needs committing afterwards.
+Keybindings are all LazyVim defaults and live in the
+[cheatsheet](cheatsheet.md#neovim), along with the health commands worth knowing when
+something breaks. Note that `:LspInfo` no longer exists — it's `:checkhealth vim.lsp` now.
 
 ### Learning the motions
 
@@ -281,17 +275,7 @@ The leverage isn't in memorising bindings, it's in the grammar: an **operator** 
 `d` delete, `y` yank, `v` select) takes a **selector** (`i` inner, `a` around) and a **text
 object**. Fifteen or so keys therefore cover several hundred edits. `mini.ai` and
 `nvim-treesitter-textobjects` add the syntax-aware objects, which is where most of the value is
-for TypeScript:
-
-| Object                | Selects                                              |
-| --------------------- | ---------------------------------------------------- |
-| `f`                   | A function — `caf` replaces one, `cif` just its body |
-| `u`                   | A function call, name and arguments together         |
-| `t`                   | An HTML or JSX tag — `cit` swaps the contents        |
-| `o`                   | The nearest block, conditional or loop               |
-| `c`                   | A class                                              |
-| `e`                   | One camelCase segment of an identifier               |
-| `w` / `p` / `"` / `(` | Word, paragraph, quotes, brackets                    |
+for TypeScript — they're listed in the [cheatsheet](cheatsheet.md#text-objects).
 
 `hardtime.nvim` handles the habit side. It is set to `restriction_mode = "hint"`, so pressing
 `j` five times in a row prints the motion that would have been shorter rather than swallowing
@@ -313,14 +297,9 @@ before overwriting, and `./setup.sh stow-home` puts things back.
 
 ## Cloning repos
 
-Setup creates `~/code`, and `shared/.zshrc` wraps `git` so a bare clone lands there:
-
-```bash
-git clone https://github.com/org/repo.git   # → ~/code/repo
-git clone https://github.com/org/repo.git .  # explicit target → clones into the current dir
-```
-
-Any invocation with an explicit target (or extra flags) is passed straight through to `git`.
+Setup creates `~/code`, and `shared/.zshrc` wraps `git` so a bare `git clone <url>` lands
+there rather than in the current directory. Any invocation with an explicit target (or extra
+flags) is passed straight through to `git`.
 
 ## Git identity & commit signing
 
@@ -393,7 +372,7 @@ Dotfiles are split into three `stow` packages:
 
 | Package   | Contents                                                                                   | Stowed on |
 | --------- | ------------------------------------------------------------------------------------------ | --------- |
-| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty and Neovim config              | always    |
+| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty, tmux, Neovim, `.local/bin`    | always    |
 | `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases) | macOS     |
 | `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`)                                   | Linux     |
 

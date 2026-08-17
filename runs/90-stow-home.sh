@@ -24,6 +24,34 @@ resolve_link() {
   fi
 }
 
+repo_name=$(basename "$repo_root")
+
+# stow --restow only knows about files the package still contains, so deleting or
+# renaming one leaves a dangling symlink in $HOME forever. Clear those out first.
+prune_orphans() {
+  local package="$1"
+  local entry target link dest
+
+  while IFS= read -r entry; do
+    target="$HOME/$(basename "$entry")"
+    [[ -e "$target" || -L "$target" ]] || continue
+
+    while IFS= read -r link; do
+      dest=$(readlink "$link")
+
+      case "$dest" in
+        "$repo_root"/* | *"/$repo_name/$package/"*) ;;
+        *) continue ;;
+      esac
+
+      [[ -e "$link" ]] && continue
+
+      echo "🧹 Removing orphaned symlink $link"
+      rm -f "$link"
+    done < <(find "$target" -type l 2>/dev/null)
+  done < <(find "$package" -mindepth 1 -maxdepth 1)
+}
+
 backup_conflicts() {
   local package="$1"
   while IFS= read -r src; do
@@ -49,6 +77,7 @@ backup_conflicts() {
 
 for package in "${packages[@]}"; do
   echo "🔗 Stowing $package dotfiles..."
+  prune_orphans "$package"
   backup_conflicts "$package"
   stow --no-folding --restow --verbose "$package"
 done

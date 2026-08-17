@@ -15,9 +15,6 @@ go
 libqalculate
 neovim
 noto-fonts-extra
-omarchy
-omarchy-keyring
-omarchy-settings
 openbsd-netcat
 python-pip
 qt5-wayland

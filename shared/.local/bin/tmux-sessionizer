@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Immediate subdirectories of these become sessions.
+parents=("$HOME/code")
+
+# These become sessions themselves, not their children.
+leaves=("$HOME/.dotfiles")
+
+if ! command -v fzf >/dev/null 2>&1; then
+  echo "tmux-sessionizer needs fzf on PATH." >&2
+  exit 1
+fi
+
+candidates() {
+  local dir
+  for dir in "${parents[@]}"; do
+    if [[ -d $dir ]]; then
+      find "$dir" -mindepth 1 -maxdepth 1 -type d
+    fi
+  done
+  for dir in "${leaves[@]}"; do
+    if [[ -d $dir ]]; then
+      printf '%s\n' "$dir"
+    fi
+  done
+}
+
+if [[ $# -eq 1 ]]; then
+  selected=$1
+else
+  selected=$(candidates | sort | fzf --prompt="session> " --height=40% --reverse) || true
+fi
+
+if [[ -z ${selected:-} ]]; then
+  exit 0
+fi
+
+if [[ ! -d $selected ]]; then
+  echo "Not a directory: $selected" >&2
+  exit 1
+fi
+
+# tmux parses dots and colons in session names as target separators.
+session=$(basename "$selected" | tr './:' '___')
+
+if ! tmux has-session -t="$session" 2>/dev/null; then
+  tmux new-session -ds "$session" -c "$selected"
+fi
+
+# switch-client needs an attached client; from a bare shell we have to attach.
+if [[ -n ${TMUX:-} ]]; then
+  tmux switch-client -t "$session"
+else
+  tmux attach-session -t "$session"
+fi
