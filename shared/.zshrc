@@ -187,8 +187,14 @@ if whence -p brew >/dev/null; then
     local ret=$?
     if [[ $ret -eq 0 ]]; then
       case "$1" in
-        install|uninstall|remove|rm|tap|untap)
+        install|uninstall|remove|rm|untap)
           "$HOME/.dotfiles/scripts/update-brewfile.sh"
+          ;;
+        tap)
+          # Bare `brew tap` only lists taps, so it must not pay for a full dump.
+          if [[ $# -ge 2 ]]; then
+            "$HOME/.dotfiles/scripts/update-brewfile.sh"
+          fi
           ;;
       esac
     fi

@@ -16,9 +16,6 @@ if ! command -v brew >/dev/null 2>&1; then
   exit 1
 fi
 
-# Ensure the VS Code CLI is reachable so `brew bundle` can install extensions.
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-
 # Adopt apps already present in /Applications instead of failing on them.
 export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS:-} --adopt"
 
@@ -29,7 +26,9 @@ brew trust --tap shaunsingh/sfmono-nerd-font-ligaturized
 echo "🍺 Installing from Brewfile..."
 
 # --no-upgrade: only install what's missing; don't upgrade existing tools on reruns.
-if brew bundle --no-upgrade --file="$repo_root/Brewfile"; then
+# --no-vscode: refuse to drive the VS Code CLI even if a stale Brewfile still lists extensions,
+# since `code` hangs rather than failing when it cannot talk to the app.
+if brew bundle --no-upgrade --no-vscode --file="$repo_root/Brewfile"; then
   echo "✅ Brewfile complete."
 else
   echo "⚠️  Some Brewfile entries failed to install. Common causes:"
