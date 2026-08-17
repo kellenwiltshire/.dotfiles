@@ -15,6 +15,28 @@ detect_os() {
 DOTFILES_OS="$(detect_os)"
 export DOTFILES_OS
 
+# A just-installed Homebrew is not on PATH yet, and setup.sh runs each runs/ script as its own
+# process, so the shellenv eval in 00-install-homebrew.sh cannot reach the scripts after it.
+# Re-apply it on every source, otherwise install_package falls through every branch and reports
+# no supported package manager on a fresh Mac.
+ensure_brew_on_path() {
+  command -v brew >/dev/null 2>&1 && return 0
+
+  local candidate
+  for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [[ -x "$candidate" ]]; then
+      eval "$("$candidate" shellenv)"
+      return 0
+    fi
+  done
+
+  # Best effort: finding nothing is normal on Linux, and every caller runs under set -e, so a
+  # non-zero status here would abort the script at the point it sources this file.
+  return 0
+}
+
+ensure_brew_on_path
+
 install_package() {
   local command_name="$1"
   local package_name="${2:-$command_name}"
