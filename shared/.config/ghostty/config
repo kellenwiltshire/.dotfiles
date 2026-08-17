@@ -59,3 +59,9 @@ keybind = shift+enter=csi:13;2u
 
 # Legacy encoding sends Alt+Shift+Enter the same as Alt+Enter; send CSI-u so tmux can match M-S-Enter.
 keybind = alt+shift+enter=csi:13;4u
+
+# Ghostty ships macOS defaults of alt+arrow_left=esc:b and alt+arrow_right=esc:f to imitate
+# Terminal.app word motion. That swallows the keys before tmux sees M-Left / M-Right, and the
+# bare ESC drops Neovim out of insert mode. Release them back to the terminal.
+keybind = alt+arrow_left=unbind
+keybind = alt+arrow_right=unbind
