@@ -26,9 +26,9 @@ brew trust --tap shaunsingh/sfmono-nerd-font-ligaturized
 echo "🍺 Installing from Brewfile..."
 
 # --no-upgrade: only install what's missing; don't upgrade existing tools on reruns.
-# --no-vscode: refuse to drive the VS Code CLI even if a stale Brewfile still lists extensions,
-# since `code` hangs rather than failing when it cannot talk to the app.
-if brew bundle --no-upgrade --no-vscode --file="$repo_root/Brewfile"; then
+# There is no --no-vscode here: unlike `dump`, the install subcommand rejects it outright. Keeping
+# `vscode` lines out of the Brewfile is what stops brew from driving the hang-prone `code` CLI.
+if brew bundle --no-upgrade --file="$repo_root/Brewfile"; then
   echo "✅ Brewfile complete."
 else
   echo "⚠️  Some Brewfile entries failed to install. Common causes:"

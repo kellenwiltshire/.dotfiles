@@ -82,7 +82,7 @@ SPACESHIP_PROMPT_SEPARATE_LINE=false
 zstyle ':omz:update' mode auto
 zstyle ':omz:update' frequency 14
 
-plugins=(vscode zsh-autosuggestions git you-should-use zsh-bat zsh-syntax-highlighting fzf-tab)
+plugins=(zsh-autosuggestions git you-should-use zsh-bat zsh-syntax-highlighting fzf-tab)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -90,8 +90,6 @@ else
   autoload -Uz compinit
   compinit
 fi
-
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
 # Bun
 export BUN_INSTALL="$HOME/.bun"
@@ -105,7 +103,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # EDITOR_CMD is the bare command; EDITOR adds --wait for GUI editors so git blocks
 # until the buffer is closed.
-for _candidate in nvim cursor code vim vi; do
+for _candidate in nvim cursor vim vi; do
   if command -v "$_candidate" >/dev/null; then
     export EDITOR_CMD="$_candidate"
     break
@@ -114,9 +112,9 @@ done
 unset _candidate
 
 case "$EDITOR_CMD" in
-  cursor|code) export EDITOR="$EDITOR_CMD --wait" ;;
-  "")          ;;
-  *)           export EDITOR="$EDITOR_CMD" ;;
+  cursor) export EDITOR="$EDITOR_CMD --wait" ;;
+  "")     ;;
+  *)      export EDITOR="$EDITOR_CMD" ;;
 esac
 export VISUAL="$EDITOR"
 
@@ -156,7 +154,7 @@ alias dots="\$EDITOR_CMD ~/.dotfiles"
 alias brewdump="~/.dotfiles/scripts/update-brewfile.sh"
 alias pacdump="~/.dotfiles/scripts/update-pacfile.sh"
 alias gco="git checkout"
-alias c="code ."
+alias c="\$EDITOR_CMD ."
 alias v="nvim"
 alias main="gco main && gl"
 alias develop="gco develop && gl"

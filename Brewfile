@@ -113,6 +113,4 @@ cask "spotify"
 cask "stats"
 # JDK from the Eclipse Foundation (Adoptium)
 cask "temurin"
-# Open-source code editor
-cask "visual-studio-code"
 npm "corepack"

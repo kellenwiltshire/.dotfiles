@@ -24,6 +24,5 @@ solaar
 stow
 ttf-cascadia-mono-nerd
 typora
-visual-studio-code-bin
 xmlstarlet
 zsh

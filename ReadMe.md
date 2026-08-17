@@ -12,9 +12,9 @@ explains why things are set up the way they are.
 ## What gets installed
 
 On macOS, `Brewfile` is the source of truth for CLI tools, GUI apps (AeroSpace, Cursor,
-VS Code, Ghostty, Raycast, Spotify, Proton Mail), fonts, and VS Code extensions. After
-installing new things, refresh it with the `brewdump` alias (or run
-`scripts/update-brewfile.sh`), then review the diff and commit.
+Ghostty, Raycast, Spotify, Proton Mail) and fonts. After installing new things, refresh it
+with the `brewdump` alias (or run `scripts/update-brewfile.sh`), then review the diff and
+commit.
 
 **Not in the Brewfile on purpose:** Chrome, Firefox, Slack and Docker Desktop are deployed
 by Jamf and owned by `root` in `/Applications`. Homebrew had _adopted_ them (see
@@ -407,8 +407,9 @@ live in `macos/.zshrc.local` and are only stowed on macOS.
 `.ssh/config` lives in `macos/` rather than `shared/` because it uses Apple's `UseKeychain`.
 
 GUI editor settings are deliberately **not** tracked: Cursor is work-only on a single
-machine, and VS Code on Omarchy uses its own Settings Sync. The `Brewfile` still tracks the
-VS Code extension _list_. Neovim is the exception — see [Neovim](#neovim).
+machine. VS Code is gone entirely — the editor, its extension list and the `code` PATH entry
+were all removed in favour of LazyVim, so `brewdump` passes `--no-vscode` to keep extensions
+from creeping back into the `Brewfile`. Neovim is the exception — see [Neovim](#neovim).
 
 The final step stows `shared` plus the package for the detected OS, so macOS never
 symlinks the Hyprland config and Linux never symlinks the AeroSpace config. Before
