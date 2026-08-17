@@ -282,3 +282,4 @@ if whence -p brew >/dev/null; then
   fi
   unset _brewup_stamp
 fi
+. /opt/homebrew/bin/hs-opskit-rc-zsh

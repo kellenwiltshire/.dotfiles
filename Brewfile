@@ -1,4 +1,5 @@
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
+tap "hashicorp/tap"
 tap "hootsuite/homebrew", "hootsuite@hootsuite.ghe.com:hootsuite/homebrew.git", trusted: true
 tap "nikitabobko/tap", trusted: true
 tap "shaunsingh/sfmono-nerd-font-ligaturized", "https://github.com/shaunsingh/homebrew-SFMono-Nerd-Font-Ligaturized", trusted: true
@@ -49,7 +50,7 @@ brew "kcat"
 # Lazier way to manage everything docker
 brew "lazydocker"
 # Simple terminal UI for git commands
-brew "lazygit", link: false
+brew "lazygit"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
@@ -74,12 +75,12 @@ brew "tealdeer"
 brew "tmux"
 # Parser generator tool
 brew "tree-sitter-cli"
-# Secures, stores, and tightly controls access to secrets
-brew "vault"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
+# Vault
+brew "hashicorp/tap/vault", trusted: true
 # A tool to format eventbus protobuf messages into json
 brew "hootsuite/homebrew/eventcat"
 # hootctl controls the universe of the Hootsuite developer
@@ -93,7 +94,7 @@ brew "hootsuite/homebrew/hs-opskit"
 # Minikube v2 development environment for Hootsuite
 brew "hootsuite/homebrew/hs-minikube@2"
 # AeroSpace is an i3-like tiling window manager for macOS
-cask "nikitabobko/tap/aerospace"
+cask "nikitabobko/tap/aerospace", trusted: true
 # Write, edit, and chat about your code with AI
 cask "cursor"
 # Command-line agent for Cursor
@@ -111,6 +112,4 @@ cask "raycast"
 cask "spotify"
 # System monitor for the menu bar
 cask "stats"
-# JDK from the Eclipse Foundation (Adoptium)
-cask "temurin"
 npm "corepack"
