@@ -18,7 +18,7 @@ brew "cryptography"
 # Load/unload environment variables based on $PWD
 brew "direnv"
 # Pack, ship and run any application as a lightweight container
-brew "docker", link: false
+brew "docker"
 # Docker CLI plugin for extended build capabilities with BuildKit
 brew "docker-buildx"
 # Isolated development environments using Docker
@@ -50,7 +50,7 @@ brew "kcat"
 # Lazier way to manage everything docker
 brew "lazydocker"
 # Simple terminal UI for git commands
-brew "lazygit"
+brew "lazygit", link: false
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Library to render SVG files using Cairo
