@@ -8,6 +8,7 @@ return {
       sources = {
         -- the `files` source hard-codes these to false, and source config wins over global
         files = { hidden = true, ignored = true },
+        explorer = { layout = { layout = { position = "right" } } },
       },
     },
   },
