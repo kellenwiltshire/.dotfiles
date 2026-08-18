@@ -51,7 +51,7 @@ if brew bundle --no-upgrade --file="$repo_root/Brewfile"; then
   echo "✅ Brewfile complete."
 else
   echo "⚠️  Some Brewfile entries failed to install. Common causes:"
-  echo "   - the private 'hootsuite/homebrew' tap needs internal auth (run 'hs-dotfiles-init')"
+  echo "   - the private work tap needs internal auth (run 'hs-dotfiles-init')"
   echo "   - a cask couldn't be adopted because the installed version differs"
   echo "   Re-run just this step with: ./setup.sh brew-bundle"
 fi

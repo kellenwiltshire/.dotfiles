@@ -116,8 +116,8 @@ still need a human:
 - Grant **AeroSpace** Accessibility permission (System Settings → Privacy & Security →
   Accessibility), or it can't move windows.
 - Set Ghostty as the default terminal (Ghostty → Settings) — there's no clean CLI for it.
-- For Hootsuite tooling: run `hs-dotfiles-init` to auth the private `hootsuite/homebrew`
-  tap, then `./setup.sh brew-bundle` to finish installing those formulae.
+- For work tooling: run `hs-dotfiles-init` to auth the private Homebrew tap, then
+  `./setup.sh brew-bundle` to finish installing those formulae.
 
 ### Linux (Omarchy)
 
@@ -336,10 +336,10 @@ four lines each — the include plus one email — so a setting can't drift betw
 [include]
  path = ~/.gitconfig-common
 [user]
- email = kellen.wiltshire@hootsuite.com   # macOS (work machine)
+ email = you@work-example.com   # macOS (work machine)
 ```
 
-The Mac only ever holds work repos, so it uses the Hootsuite identity everywhere with no
+The Mac only ever holds work repos, so it uses the work identity everywhere with no
 per-repo split; Omarchy uses the personal address. The two are never stowed together.
 
 Both sign every commit with `~/.ssh/id_ed25519` (SSH signing, not GPG), so **each machine

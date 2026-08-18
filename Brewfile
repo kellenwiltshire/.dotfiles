@@ -83,15 +83,15 @@ brew "zoxide"
 brew "hashicorp/tap/vault", trusted: true
 # A tool to format eventbus protobuf messages into json
 brew "hootsuite/homebrew/eventcat"
-# hootctl controls the universe of the Hootsuite developer
+# hootctl controls the universe of the work developer environment
 brew "hootsuite/homebrew/hootctl"
 # MacOS binary for service automation tool
 brew "hootsuite/homebrew/hs-deployments"
 # Scripts to setup developers dotfiles & auth for artifactory
 brew "hootsuite/homebrew/hs-dotfiles-init"
-# Hootsuite tooling for developers
+# Work tooling for developers
 brew "hootsuite/homebrew/hs-opskit"
-# Minikube v2 development environment for Hootsuite
+# Minikube v2 development environment for work
 brew "hootsuite/homebrew/hs-minikube@2"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace", trusted: true
