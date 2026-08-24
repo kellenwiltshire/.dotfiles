@@ -15,6 +15,7 @@ go
 libqalculate
 neovim
 noto-fonts-extra
+omarchy-chromium
 openbsd-netcat
 python-pip
 qt5-wayland
@@ -24,5 +25,6 @@ solaar
 stow
 ttf-cascadia-mono-nerd
 typora
+visual-studio-code-bin
 xmlstarlet
 zsh
