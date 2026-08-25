@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+note=${TMUX_SCRATCHPAD_FILE:-$HOME/notes/scratch.md}
+mkdir -p "$(dirname "$note")"
+
+if ! command -v nvim >/dev/null 2>&1; then
+  echo "tmux-scratchpad needs nvim on PATH." >&2
+  exit 1
+fi
+
+# Toggling the popup detaches rather than quits, so the note is only ever flushed by autosave:
+# CursorHold fires 'updatetime' ms after typing stops, the rest cover leaving the buffer.
+editor="nvim -c 'set autowriteall' -c 'autocmd CursorHold,FocusLost,BufLeave * silent! wall' '$note'"
+
+# $TMUX has to go, or this client refuses to attach to the server it is already running under.
+unset TMUX
+
+if ! tmux has-session -t=scratch 2>/dev/null; then
+  tmux new-session -ds scratch -c "$(dirname "$note")" "$editor"
+fi
+
+# The global detach-on-destroy=off would leave the popup showing some other session once nvim
+# exits; scratch is the one session whose death should just close the window it lives in.
+tmux set-option -t scratch detach-on-destroy on
+
+exec tmux attach-session -t=scratch
