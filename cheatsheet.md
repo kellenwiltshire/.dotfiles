@@ -82,6 +82,8 @@ shell. Keys marked *no prefix* are pressed directly.
 | `prefix` + `K` | Kill session (you stay in tmux) |
 | `prefix` + `P` / `N` | Previous / next session |
 | `alt`+`up` / `alt`+`down` | Previous / next session (*no prefix*) |
+| `alt`+`o` | Toggle back to the session you came from (*no prefix*) |
+| `prefix` + `L` | Toggle back to the session you came from |
 | `prefix` + `d` | Detach |
 | `tmux ls` | List sessions |
 | `tmux attach` | Reattach to the last session |
@@ -128,6 +130,15 @@ machines via OSC 52.
 | `y` | Copy the selection and exit |
 | `prefix` + `]` | Paste |
 | `q` | Leave copy mode |
+
+### Scratch pad
+
+| Keys | Does |
+| --- | --- |
+| `alt`+`g` | Open / close a popup on `~/notes/scratch.md` (*no prefix*) |
+
+One shared `scratch` session behind the popup, so closing it detaches instead of quitting nvim:
+cursor, undo history and unsaved text survive. Autosave flushes the file when you stop typing.
 
 ### Config
 
