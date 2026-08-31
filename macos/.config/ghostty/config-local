@@ -1,7 +1,7 @@
 # macOS-only overrides on top of shared/.config/ghostty/config.
 
 # Retina panels need 4pt more than the Omarchy laptop to match apparent size.
-font-size = 16
+font-size = 14
 
 # Ghostty only defaults option-to-alt on U.S. Standard / U.S. International layouts; on
 # Canadian it composes Unicode instead, so alt+1..9 never reach tmux as M-1..M-9. Arrow and
