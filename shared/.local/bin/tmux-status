@@ -29,7 +29,9 @@ c_reset='#[bg=default,fg=default]'
 badge_left=$(printf '\xee\x82\xb6')
 badge_right=$(printf '\xee\x82\xb4')
 
-read -r now clock < <(date '+%s %H:%M')
+# A pipe separator, not a space: %p puts one inside the clock. %l is space-padded rather than
+# zero-padded, which keeps the badge a constant width across the 9:59/10:00 boundary.
+IFS='|' read -r now clock < <(date '+%s|%l:%M %p')
 
 is_number() { [[ ${1:-} =~ ^[0-9]+$ ]]; }
 is_number "$width" || width=200
