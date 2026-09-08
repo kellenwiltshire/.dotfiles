@@ -184,6 +184,29 @@ panel matches the apparent size of the Omarchy laptop. Includes are loaded after
 that references them, so the override wins wherever it sits, and the leading `?` keeps
 Ghostty quiet on Linux where that file is never stowed.
 
+### Night Owl in Slack
+
+Slack has no config file — themes live in your account — so the palette is recorded here instead:
+
+```
+#011627,#82AAFF,#7FDBCA,#EF5350
+```
+
+Four slots, in the order the current dialog lists them: System Navigation, Selected Items,
+Presence Indication, Notifications. Every value is already somewhere else in this repo — the
+Ghostty `background`, the `#82AAFF` the active tmux tab and pane border use, the `#7FDBCA` of the
+session badge, and the `#EF5350` of the bell style — so a selected channel reads like a selected
+window. Slack derives the sidebar text and hover shades itself.
+
+Paste it into Preferences → Appearance → Custom theme, or into any message and click the "Apply
+Slack theme" button that appears. Set the base appearance to Dark first: a custom theme only
+colours the sidebar, so over the light base you get a white message pane beside a navy rail.
+Mobile ignores custom palettes and follows the system setting.
+
+Older Slack builds ask for eight colours instead of four, taking the hover and text shades
+explicitly. The equivalent string for those, and for the Import theme path, is
+`#011627,#1D3B53,#82AAFF,#011627,#1D3B53,#D6DEEB,#7FDBCA,#EF5350`.
+
 ## tmux
 
 `shared/.config/tmux/tmux.conf` is used on both machines. It starts from the `tmux.conf`
@@ -247,9 +270,22 @@ navigation: `prefix` + `h` was a split and `prefix` + `k` was kill-window, so ki
 now `prefix` + `X` and the splits moved to `|` and `-`. Everything else Omarchy bound is
 untouched, including the no-prefix `M-Enter` splits, `C-M-arrows`, and `M-1`…`M-9`.
 
-Two keys leave the shell as a result. The `C-a` prefix takes readline's start-of-line, though
-`prefix` + `a` sends a literal one, and `C-f` becomes the sessionizer instead of
-`forward-char`. `C-b` is unbound entirely.
+Several keys leave the shell as a result. The `C-a` prefix takes readline's start-of-line and
+`C-f` becomes the sessionizer instead of `forward-char`. `C-h`, `C-j`, `C-k` and `C-l` go to pane
+navigation, taking backward-delete, accept-line, kill-line and clear-screen with them. Every one
+of those is still reachable as `prefix` + the same key, which sends the literal through. `C-b` is
+unbound entirely.
+
+### Neovim navigation
+
+`C-h`/`j`/`k`/`l` moves between Neovim splits and tmux panes without caring which is which.
+The tmux half is four `if -F` bindings; the Neovim half is `mrjones2014/smart-splits.nvim` in
+`shared/.config/nvim/lua/plugins/tmux.lua`.
+
+It was picked over the better-known `vim-tmux-navigator` for how the two halves agree on what is
+running. smart-splits sets a `@pane-is-vim` option on its own tmux pane, so tmux answers the
+question by reading a format. The traditional approach runs `ps` against the pane's tty on every
+single press of those four keys and pattern-matches the process name.
 
 ## Hyprland config
 

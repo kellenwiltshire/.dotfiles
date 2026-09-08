@@ -108,6 +108,7 @@ editing the `parents` and `leaves` arrays at the top of `shared/.local/bin/tmux-
 | Keys | Does |
 | --- | --- |
 | `prefix` + `h` / `j` / `k` / `l` | Move between panes — hold prefix to repeat |
+| `ctrl`+`h` / `j` / `k` / `l` | Move between panes **and** Neovim splits (*no prefix*) |
 | `prefix` + `\|` | Split side by side |
 | `prefix` + `-` | Split stacked |
 | `prefix` + `x` | Kill pane |
@@ -117,6 +118,11 @@ editing the `parents` and `leaves` arrays at the top of `shared/.local/bin/tmux-
 | `alt`+`enter` | Split stacked (*no prefix*) |
 | `alt`+`shift`+`enter` | Split side by side (*no prefix*) |
 | `alt`+`escape` | Kill pane (*no prefix*) |
+
+`ctrl`+`h`/`j`/`k`/`l` treats Neovim's splits and tmux's panes as one grid: walk off the edge of a
+split and you land in the pane next door. tmux only hands the key to Neovim when the pane is
+running it, so those four are taken from readline everywhere else — `prefix` + the same key sends
+the literal one, which is where backward-delete, accept-line, kill-line and clear-screen went.
 
 ### Copy mode
 
@@ -131,14 +137,16 @@ machines via OSC 52.
 | `prefix` + `]` | Paste |
 | `q` | Leave copy mode |
 
-### Scratch pad
+### Popups
 
 | Keys | Does |
 | --- | --- |
 | `alt`+`g` | Open / close a popup on `~/notes/scratch.md` (*no prefix*) |
+| `prefix` + `g` | lazygit on the current pane's directory |
 
-One shared `scratch` session behind the popup, so closing it detaches instead of quitting nvim:
-cursor, undo history and unsaved text survive. Autosave flushes the file when you stop typing.
+One shared `scratch` session sits behind the notes popup, so closing it detaches instead of
+quitting nvim: cursor, undo history and unsaved text survive. Autosave flushes the file when you
+stop typing. The lazygit popup holds no state and closes when lazygit exits.
 
 ### Status bar
 
