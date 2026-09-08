@@ -207,6 +207,39 @@ It is a port of Prime's script with one bug fixed: his ends unconditionally in
 `switch-client`, which fails with "no current client" when run from a bare shell while a tmux
 server is already running. This version attaches when outside tmux and switches when inside.
 
+### Status bar
+
+`shared/.local/bin/tmux-status` prints everything right of the window list — CPU, load, memory,
+free disk, network rate and battery pinned to the edge, with the clock centred — in a single fork
+per `status-interval`, currently two seconds, which is also the window the network rate is
+averaged over. It reads `/proc` on Linux and `sysctl`, `vm_stat`, `netstat` and `pmset` on
+macOS, so no plugin manager is involved. Segments drop out as the client narrows; see the
+[cheatsheet](cheatsheet.md#status-bar) for the order and the colour thresholds.
+
+CPU and network are cumulative counters, so a percentage or a rate only exists relative to the
+previous sample. That sample lives in `$TMPDIR/tmux-status.$UID.<width>`, keyed by width because
+tmux runs one job per distinct command string — two clients of different sizes would otherwise
+overwrite each other's baseline, and a run inside the same second has nothing to divide by.
+Battery, disk and the choice of network interface cost the most forks and move the slowest, so
+they refresh every 30 seconds and are replayed from the state file in between.
+
+Two platform notes. macOS has no `/proc/stat`, so utilisation there is the delta of every
+process's cumulative CPU time over the wall-clock delta across all cores, which reads slightly low
+when short-lived processes churn. And the default route on the Mac is usually a VPN tunnel whose
+bytes are counted again on the interface underneath, so the script picks the busiest physical link
+rather than following the route.
+
+The clock is centred with `#[align=absolute-centre]`, which pins it to the middle of the line
+whatever surrounds it. Plain `#[align=centre]` shares out the gap left over after the metrics
+instead, which on the ultrawide put the clock at 39% across rather than 50%; the script falls back
+to it only when the metrics are wide enough relative to the client that true centre would be
+overwritten. Every metric is padded to its widest form for the same reason — an unpadded value
+gaining a digit shifts the block, and the clock with it.
+
+The script also owns the clock badge rather than leaving it to `tmux.conf`. The Nerd Font half
+circles that cap it, U+E0B6 and U+E0B4, are Private Use Area codepoints that some editors and
+agents strip on write; `printf` puts them out of reach of that.
+
 ### Keys that moved
 
 Two of Omarchy's prefix keys had to move to make room for Prime's `h`/`j`/`k`/`l` pane

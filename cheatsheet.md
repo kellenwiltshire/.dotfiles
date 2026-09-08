@@ -140,6 +140,23 @@ machines via OSC 52.
 One shared `scratch` session behind the popup, so closing it detaches instead of quitting nvim:
 cursor, undo history and unsaved text survive. Autosave flushes the file when you stop typing.
 
+### Status bar
+
+Left is the session name, which becomes an orange `PREFIX` once the prefix is armed and a purple
+`COPY` in copy mode. The clock sits in the middle. Right is CPU, load, memory used of total, free
+disk, network down and up per second, battery and the host.
+
+| Reads | Means |
+| --- | --- |
+| `BAT 79%+` | Charging |
+| `BAT 79%=` | Plugged in, not charging |
+| `BAT 79%` | On battery — orange under 20%, red under 10% |
+| `CPU --` | Only one sample so far; a rate needs two, so this clears on the next tick |
+
+Values go orange then red as they get worse: CPU past 60% and 85%, load past 70% and 100% of the
+core count, memory past 75% and 90%, disk under 20G and 10G free. Segments drop as the terminal
+narrows — load first, then disk, the host and the network — so the clock is always the survivor.
+
 ### Config
 
 | Command | Does |
