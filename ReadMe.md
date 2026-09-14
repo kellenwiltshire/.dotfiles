@@ -36,7 +36,7 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 - Docker tooling: CLI, `buildx`, `compose`
 - `lazydocker`
 - [Ghostty](https://ghostty.org/) terminal (set as default on Linux)
-- `tmux` — config and sessionizer are [below](#tmux)
+- `tmux` — config and session picker are [below](#tmux)
 - `bun`
 - `go`
 - [Cursor CLI](https://cursor.com/docs/cli) (`cursor-agent`) — macOS only; the `cursor-cli`
@@ -164,7 +164,7 @@ emacs prefix) and Ghostty swallows any key it has bound before the shell sees it
 A terminal is started at login on both machines — `after-startup-command` in
 `.aerospace.toml`, `o.launch_on_start` in `hypr/autostart.lua` — and the window rules above
 put it on workspace 1. tmux is not started for you: attach with `ctrl`+`f`
-(the [sessionizer](#sessionizer)) or plain `tmux`.
+(the [session picker](#session-picker)) or plain `tmux`.
 
 `cmd`+`Return` gets you back to it on macOS, mirroring Omarchy's stock `super`+`Return`,
 which needs no override. The two behave slightly differently: `super`+`Return` opens another
@@ -212,23 +212,53 @@ explicitly. The equivalent string for those, and for the Import theme path, is
 `shared/.config/tmux/tmux.conf` is used on both machines. It starts from the `tmux.conf`
 Omarchy ships — which is well tuned, and worth diffing against
 `$OMARCHY_PATH/config/tmux/tmux.conf` after an Omarchy update — and layers
-[ThePrimeagen's](https://github.com/ThePrimeagen/.dotfiles) prefix, pane keys and sessionizer
-on top.
+[ThePrimeagen's](https://github.com/ThePrimeagen/.dotfiles) prefix and pane keys on top.
 
 Deliberately **not** taken from his config: `xclip` for yanking (X11-only, so it is dead on
 both Wayland and macOS — Omarchy's `set-clipboard on` uses OSC 52 and works on both),
 `screen-256color` (loses true colour and undercurl in Neovim), and his bindings into his own
 repos.
 
-### Sessionizer
+### Session picker
 
-`shared/.local/bin/tmux-sessionizer` fuzzy-picks a project and attaches a session named after
-it, creating one on first use and reusing it forever after. It's on `C-f` from any shell and
-`prefix` + `f` inside tmux — see the [cheatsheet](cheatsheet.md#sessions).
+[tmux-sessionx](https://github.com/omerxx/tmux-sessionx) is the one "go somewhere" key, on
+`prefix` + `s` and on `C-f` from the shell. It lists running sessions with their git branches,
+most recent first, then the `~/code` projects that are not open yet. `?` opens a preview of
+whatever is highlighted — either the session's live screen or the directory's contents — which
+starts hidden so the common case is a plain list. Renaming, killing and window-level jumps all
+happen inside the picker rather than as separate bindings — see the
+[cheatsheet](cheatsheet.md#inside-the-picker).
 
-It is a port of Prime's script with one bug fixed: his ends unconditionally in
-`switch-client`, which fails with "no current client" when run from a bare shell while a tmux
-server is already running. This version attaches when outside tmux and switches when inside.
+This replaced a hand-written picker that did the switching half of the same job. The plugin wins
+on the half that was never going to get written: zoxide as a fallback for anything outside
+`~/code`, kill and rename in place, and a window list. Two portability bugs in a hundred lines of
+status-bar bash, both found the hard way, were the other half of the argument.
+
+`runs/93-tmux-plugins.sh` clones it and `tmux.conf` sources `sessionx.tmux` directly. No TPM: one
+plugin does not earn a plugin manager, and `clone_or_update` is already how every other
+third-party checkout here works. It runs after stowing because `stow --no-folding` leaves
+`~/.config/tmux` a real directory of symlinks, which is what lets `plugins/` sit inside it
+untouched.
+
+Three things about the configuration are not obvious from the plugin's README:
+
+- `sessionx.tmux` reads every `@sessionx-*` option once, at load, and stores the finished `fzf`
+  argument list back on the tmux server. Changing an option means `prefix` + `q` to reload the
+  config, not just reopening the picker.
+- `@sessionx-custom-paths` is word-split straight into `find`, where a tilde stays literal, and
+  `$HOME` differs between the two machines. It is set from a `run-shell` so a shell expands it.
+  `run-shell` without `-b` blocks tmux's command queue, which is what puts it before the load.
+- `@sessionx-fzf-builtin-tmux` uses `fzf --tmux`, added in fzf 0.53. Older versions fall back to
+  the `fzf-tmux` script, which is packaged separately from fzf and is on neither machine, so the
+  picker would open on nothing. The install script warns rather than letting that happen quietly.
+
+`~/.dotfiles` is deliberately not in the custom paths: including it would mean listing its
+subdirectories too, since that setting is global. `cd` is zoxide, so typing `dot` finds it.
+
+`shared/.local/bin/tmux-sessionx` is the `C-f` wrapper, and exists for the case sessionx refuses
+to handle. Inside tmux it hands straight over to the plugin. Outside there is no client to switch
+and nothing to list, so it attaches to the last session instead — the same key then opens the real
+picker.
 
 ### Status bar
 
@@ -279,7 +309,7 @@ now `prefix` + `X` and the splits moved to `|` and `-`. Everything else Omarchy 
 untouched, including the no-prefix `M-Enter` splits, `C-M-arrows`, and `M-1`…`M-9`.
 
 Several keys leave the shell as a result. The `C-a` prefix takes readline's start-of-line and
-`C-f` becomes the sessionizer instead of `forward-char`. `C-h`, `C-j`, `C-k` and `C-l` go to pane
+`C-f` becomes the session picker instead of `forward-char`. `C-h`, `C-j`, `C-k` and `C-l` go to pane
 navigation, taking backward-delete, accept-line, kill-line and clear-screen with them. Every one
 of those is still reachable as `prefix` + the same key, which sends the literal through. `C-b` is
 unbound entirely.
@@ -463,6 +493,8 @@ executable file in `runs/` in order:
 | `90-stow-home.sh`           | Symlink dotfiles with `stow`                          |
 | `91-ssh-allowed-signers.sh` | Write `~/.ssh/allowed_signers` for SSH commit signing |
 | `92-nvim-bootstrap.sh`      | Neovim plugins, Mason tools, treesitter parsers       |
+| `93-tmux-plugins.sh`        | Clone tmux-sessionx, check fzf is new enough          |
+| `95-tmux-glyphs.sh`         | Restore the tab separator glyphs if they were stripped |
 
 Shared helpers (package install, git clone/update, OS detection) live in
 `scripts/lib.sh`. To add a step, drop an executable script in `runs/` named with the

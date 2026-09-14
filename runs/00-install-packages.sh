@@ -10,7 +10,7 @@ echo "📦 Installing shell dependencies..."
 install_package zsh
 install_package stow
 install_package zoxide
-# tmux-sessionizer (prefix+f) and the fzf-tab plugin both hard-depend on fzf, so it cannot wait
+# tmux-sessionx (prefix+s) and the fzf-tab plugin both hard-depend on fzf, so it cannot wait
 # for the macOS Brewfile: one failed entry there aborts the whole bundle and leaves fzf missing.
 install_package fzf
 

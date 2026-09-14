@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# The picker on `C-f` from the shell, so it costs one key rather than prefix + f.
+#
+# Inside tmux the plugin script is the entire job: it draws its own popup through `fzf --tmux`
+# and ends in switch-client. It reads the fzf arguments tmux.conf had it precompute, so this
+# stays a wrapper and never duplicates any of that configuration.
+
+plugin="$HOME/.config/tmux/plugins/tmux-sessionx/scripts/sessionx.sh"
+
+if [[ ! -x $plugin ]]; then
+  echo "tmux-sessionx is not installed — run ./setup.sh tmux-plugins" >&2
+  exit 1
+fi
+
+if [[ -n ${TMUX:-} ]]; then
+  exec "$plugin"
+fi
+
+# Outside tmux there is no client to switch and sessionx will not run, so the job here is only to
+# get inside — attaching to whichever session was last used. The same key then opens the picker.
+if tmux has-session 2>/dev/null; then
+  exec tmux attach
+fi
+
+exec tmux new-session

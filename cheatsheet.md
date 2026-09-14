@@ -74,9 +74,8 @@ shell. Keys marked *no prefix* are pressed directly.
 | Keys | Does |
 | --- | --- |
 | `cmd`+`return` / `super`+`return` | Terminal on workspace 1 — activates it on macOS, new window on Omarchy |
-| `ctrl`+`f` | Sessionizer — pick a project, from any shell |
-| `prefix` + `f` | Sessionizer, from inside tmux |
-| `tmux-sessionizer <dir>` | Jump straight to a directory, skipping the picker |
+| `prefix` + `s` | Go to a session or project — popup picker with a preview |
+| `ctrl`+`f` | The same picker, one key instead of two (*no prefix*) |
 | `prefix` + `C` | New session in the current pane's directory |
 | `prefix` + `R` | Rename session |
 | `prefix` + `K` | Kill session (you stay in tmux) |
@@ -88,8 +87,33 @@ shell. Keys marked *no prefix* are pressed directly.
 | `tmux ls` | List sessions |
 | `tmux attach` | Reattach to the last session |
 
-The sessionizer offers each subdirectory of `~/code` plus `~/.dotfiles`. Change that by
-editing the `parents` and `leaves` arrays at the top of `shared/.local/bin/tmux-sessionizer`.
+The picker lists running sessions first, each with its git branch, ordered so the one you came
+from is at the top — `prefix` + `s` then Enter goes straight back. Below those come the
+subdirectories of `~/code` that are not already running; picking one creates its session on the
+way in. `?` opens a preview of whatever is highlighted — the session's live screen, or the
+directory's contents.
+
+Typing a name that matches nothing is handed to zoxide, which is how anywhere outside `~/code`
+is reached, `~/.dotfiles` included. Failing that, the name becomes an empty session.
+
+The session you are in is left out of the list, as is `scratch` — switching into the scratchpad's
+session would strand its nvim in an ordinary window.
+
+### Inside the picker
+
+| Keys | Does |
+| --- | --- |
+| `enter` | Switch to the highlighted session, creating it if it is a directory |
+| `alt`+`backspace` | Kill the highlighted session |
+| `ctrl`+`r` | Rename the highlighted session |
+| `ctrl`+`w` | List every window instead of sessions, to jump straight into one |
+| `ctrl`+`f` | List the whole zoxide database |
+| `ctrl`+`x` | List `~/.config` |
+| `ctrl`+`t` | Swap the preview for a tree of sessions and windows |
+| `ctrl`+`b` | Back to the session list after any of the above |
+| `ctrl`+`p` / `ctrl`+`n` | Up / down the list |
+| `ctrl`+`u` / `ctrl`+`d` | Scroll the preview |
+| `?` | Toggle the preview — it starts hidden |
 
 ### Windows
 

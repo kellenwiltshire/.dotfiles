@@ -98,7 +98,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Go (binaries installed via `go install`)
 export PATH="$HOME/go/bin:$PATH"
 
-# Stowed personal scripts, e.g. tmux-sessionizer
+# Stowed personal scripts, e.g. tmux-sessionx
 export PATH="$HOME/.local/bin:$PATH"
 
 # EDITOR_CMD is the bare command; EDITOR adds --wait for GUI editors so git blocks
@@ -219,9 +219,9 @@ if command -v fd >/dev/null; then
   export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 fi
 
-# Jump to a project session from a bare shell. Set after fzf's own bindings so it wins.
+# The session picker, one key instead of prefix + f. Set after fzf's own bindings so it wins.
 # This takes C-f from forward-char; use the right arrow to move a character.
-command -v tmux-sessionizer >/dev/null && bindkey -s '^f' 'tmux-sessionizer\n'
+command -v tmux-sessionx >/dev/null && bindkey -s '^f' 'tmux-sessionx\n'
 
 if command -v eza >/dev/null; then
   alias ls='eza --group-directories-first'
