@@ -252,6 +252,14 @@ when short-lived processes churn. And the default route on the Mac is usually a 
 bytes are counted again on the interface underneath, so the script picks the busiest physical link
 rather than following the route.
 
+Two portability traps cost a debugging session each, both invisible on macOS. Arch's `awk` is
+gawk, which refuses `-v load=` because `load` is one of its builtins, where BSD awk is happy to
+take it. And `read` reports failure when its input ends without a newline — so an `awk` ending in
+`printf` rather than `print` returns non-zero, which under `set -e` kills the script after the
+variables were already assigned correctly. Both are commented at the point they bite. Verify
+changes to the Linux branch in a container rather than by eye:
+`docker run --rm -v "$PWD/shared/.local/bin:/b:ro" fedora bash -c 'cp /b/tmux-status /tmp/s; chmod +x /tmp/s; /tmp/s 200 test'`.
+
 The clock is centred with `#[align=absolute-centre]`, which pins it to the middle of the line
 whatever surrounds it. Plain `#[align=centre]` shares out the gap left over after the metrics
 instead, which on the ultrawide put the clock at 39% across rather than 50%; the script falls back

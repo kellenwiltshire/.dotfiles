@@ -125,10 +125,12 @@ case $os in
     total=$((user + nice + system + idle + iowait + irq + softirq + steal))
     busy=$((total - idle - iowait))
 
+    # The newline is not decoration: `read` returns non-zero when the input ends without one, and
+    # under `set -e` that kills the script even though both variables were assigned.
     read -r mem_total mem_used < <(awk '
       /^MemTotal:/ { total = $2 }
       /^MemAvailable:/ { available = $2 }
-      END { printf "%d %d", total * 1024, (total - available) * 1024 }' /proc/meminfo)
+      END { printf "%d %d\n", total * 1024, (total - available) * 1024 }' /proc/meminfo)
     ;;
 esac
 is_number "${ncpu:-}" || ncpu=1
@@ -165,9 +167,12 @@ if ((now - slow_ts >= slow_interval)); then
 fi
 [[ -n ${batt:-} ]] || batt=-
 
+# Both reads are allowed to fail: an interface that has gone away produces no matching line, and
+# an unguarded `read` returning non-zero would take the whole script down with it. The is_number
+# guards below turn that into a zero rate rather than a blank status bar.
 if [[ $os == Darwin && $iface != - ]]; then
   read -r rx tx < <(netstat -ibn -I "$iface" |
-    awk '$3 ~ /^<Link/ { print $(NF - 4), $(NF - 1); exit }')
+    awk '$3 ~ /^<Link/ { print $(NF - 4), $(NF - 1); exit }') || true
 elif [[ -r /proc/net/dev ]]; then
   read -r rx tx < <(awk '
     NR > 2 {
@@ -177,7 +182,7 @@ elif [[ -r /proc/net/dev ]]; then
       split(halves[2], counters, " ")
       rx += counters[1]; tx += counters[9]
     }
-    END { print rx + 0, tx + 0 }' /proc/net/dev)
+    END { print rx + 0, tx + 0 }' /proc/net/dev) || true
 fi
 is_number "${rx:-}" || rx=0
 is_number "${tx:-}" || tx=0
@@ -222,7 +227,9 @@ else
 fi
 
 if ((width >= 150)); then
-  load_pct=$(awk -v load="$load" -v ncpu="$ncpu" 'BEGIN { printf "%d", load * 100 / ncpu }')
+  # Not -v load=: gawk reserves that name for a builtin and dies, while BSD awk accepts it. The
+  # same goes for anything else gawk calls its own, so keep these two deliberately unremarkable.
+  load_pct=$(awk -v avg="$load" -v cores="$ncpu" 'BEGIN { printf "%d", avg * 100 / cores }')
   add_segment LOAD "$(tier "$load_pct" 70 100)" "$(pad "$load" 5)"
 fi
 
