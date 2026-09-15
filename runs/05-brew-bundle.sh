@@ -40,7 +40,6 @@ fi
 
 # Trust third-party cask taps so `brew bundle` can load their casks.
 brew trust --tap nikitabobko/tap
-brew trust --tap shaunsingh/sfmono-nerd-font-ligaturized
 
 echo "🍺 Installing from Brewfile..."
 

@@ -14,7 +14,9 @@ fi
 echo "🍺 Refreshing $brewfile from current Homebrew state..."
 # --no-vscode: editors are LazyVim's job now. Dumping extensions also shells out to `code
 # --list-extensions`, which blocks indefinitely whenever the VS Code CLI cannot reach the app.
-brew bundle dump --force --describe --no-vscode --file="$brewfile"
+# The description comments above each entry are Homebrew 7's default. `--describe` used to ask for
+# them and is now a hard error, so naming it here would abort every dump.
+brew bundle dump --force --no-vscode --file="$brewfile"
 
 # Homebrew 4 serves these two through its JSON API and refuses to tap them, so dumping them from a
 # machine that still has them tapped locally produces a Brewfile that dies on any fresh install.

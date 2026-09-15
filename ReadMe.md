@@ -11,8 +11,10 @@ explains why things are set up the way they are.
 
 ## What gets installed
 
-On macOS, `Brewfile` is the source of truth for CLI tools, GUI apps (AeroSpace, Cursor,
-Ghostty, Raycast, Spotify, Proton Mail) and fonts. After installing new things, refresh it
+On macOS, `Brewfile` is the source of truth for CLI tools and GUI apps (AeroSpace, Cursor,
+Ghostty, Raycast, Spotify, Proton Mail). No fonts: Ghostty renders in the Nerd Font-patched
+JetBrains Mono it bundles, which is the only place a font matters here. After installing
+new things, refresh it
 with the `brewdump` alias (or run `scripts/update-brewfile.sh`), then review the diff and
 commit.
 
@@ -31,6 +33,7 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 - `zsh` + [Oh My Zsh](https://ohmyz.sh/) and plugins (autosuggestions, syntax-highlighting, zsh-bat, you-should-use, fzf-tab)
 - [Spaceship](https://spaceship-prompt.sh/) prompt theme
 - `zoxide` (smarter `cd`), `fzf` (with `Ctrl-R`/`Ctrl-T`/`Alt-C` keybindings), `direnv`
+- [carapace](https://carapace.sh/) argument completion — see [Completions](#completions)
 - Modern CLI tools: `bat`, `eza`, `fd`, `ripgrep`, `jq`, `git-delta`, `lazygit`, `tealdeer` (`tldr`), `btop`
 - `nvm` + Node LTS
 - Docker tooling: CLI, `buildx`, `compose`
@@ -206,6 +209,33 @@ Mobile ignores custom palettes and follows the system setting.
 Older Slack builds ask for eight colours instead of four, taking the hover and text shades
 explicitly. The equivalent string for those, and for the Import theme path, is
 `#011627,#1D3B53,#82AAFF,#011627,#1D3B53,#D6DEEB,#7FDBCA,#EF5350`.
+
+## Completions
+
+[carapace](https://carapace.sh/) supplies argument completion — flags, subcommands, and their
+values — for a few thousand CLIs (`carapace --list`), and is set up in the completion block of
+`shared/.zshrc`.
+It is `brew "carapace"` on macOS and `carapace-bin` on Arch, where it lives only in the AUR: the
+`pacman`-only fallback in `runs/05-arch-packages.sh` silently skips it, so that machine needs
+`yay`.
+
+Two things about that block are easy to undo by accident.
+
+The `zstyle ':completion:*' format` line looks decorative and is not. fzf-tab reads group headers
+out of that format string, and with no format set it renders carapace's results as one
+undifferentiated list. It also applies to every completion in the shell, not just carapace's,
+which is why it sits with the other `':completion:*'` styles rather than next to the
+`source <(carapace _carapace)`.
+
+Carapace `compdef`s itself over zsh's native completer for every command it knows, `git` and
+`docker` included — the latter over the `~/.docker/completions` entry that `fpath` picks up at the
+top of the file. That is deliberate, but if one of its completers is ever worse than the built-in,
+`CARAPACE_EXCLUDES=git,docker` hands those names back without disturbing the rest.
+
+`CARAPACE_BRIDGES` covers what carapace has no spec for by delegating to whichever of zsh, fish,
+bash or inshellisense already has a completer, so adding a tool never drops you back to bare
+filename completion. Carapace caches which commands it can serve so startup stays free of the
+lookup; run `carapace --clear-cache` if a newly installed tool does not complete.
 
 ## tmux
 

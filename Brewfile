@@ -2,7 +2,6 @@ tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "hashicorp/tap"
 tap "hootsuite/homebrew", "hootsuite@hootsuite.ghe.com:hootsuite/homebrew.git", trusted: true
 tap "nikitabobko/tap", trusted: true
-tap "shaunsingh/sfmono-nerd-font-ligaturized", "https://github.com/shaunsingh/homebrew-SFMono-Nerd-Font-Ligaturized", trusted: true
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Programmable completion for Bash 3.2
@@ -13,6 +12,8 @@ brew "bat"
 brew "btop"
 # Vector graphics library with cross-device output support
 brew "cairo"
+# Multi-shell multi-command argument completer
+brew "carapace"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
 # Load/unload environment variables based on $PWD
@@ -99,7 +100,6 @@ cask "nikitabobko/tap/aerospace", trusted: true
 cask "cursor"
 # Command-line agent for Cursor
 cask "cursor-cli"
-cask "font-sf-mono-nerd-font-ligaturized"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Open-source cross-platform alternative to AirDrop

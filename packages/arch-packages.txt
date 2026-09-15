@@ -5,6 +5,7 @@ bitwarden
 bitwarden-cli
 bruno
 bun
+carapace-bin
 docker-credential-secretservice
 firefox
 freerdp

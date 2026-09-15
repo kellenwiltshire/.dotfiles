@@ -147,6 +147,16 @@ else
   zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 fi
 
+# Argument completion for a few thousand commands, replacing zsh's own for each. Bridges hand
+# the rest back to whichever shell already has a completer, so nothing regresses to bare filenames.
+#
+# fzf-tab reads group headers out of this format string and shows nothing without it, so it is
+# load-bearing rather than styling, and it restyles every completion, not only carapace's.
+# Both branches above have run compinit by this point, which is all carapace's compdefs need.
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
+zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+command -v carapace >/dev/null && source <(carapace _carapace)
+
 #Alias
 alias garbageday="git branch | grep -vE '^\*?\s*(main|master|develop)\$' | xargs git branch -D"
 alias refresh="source ~/.zshrc"
