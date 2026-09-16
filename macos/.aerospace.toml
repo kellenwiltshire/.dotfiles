@@ -23,11 +23,11 @@ preset = 'qwerty'
 
 [gaps]
 inner.horizontal = 6
-inner.vertical =   6
-outer.left =       6
-outer.bottom =     6
-outer.top =        6
-outer.right =      6
+inner.vertical = 6
+outer.left = 6
+outer.bottom = 6
+outer.top = 6
+outer.right = 6
 
 [mode.main.binding]
 
@@ -76,19 +76,19 @@ cmd-shift-4 = 'move-node-to-workspace 4'
 cmd-shift-5 = 'move-node-to-workspace 5'
 
 ctrl-shift-semicolon = 'mode resize'
- 
+
 [mode.resize.binding]
 esc = 'mode main'
 enter = 'mode main'
- 
+
 left = 'resize width -50'
 right = 'resize width +50'
 up = 'resize height -50'
 down = 'resize height +50'
- 
+
 # Balance all windows evenly
 b = 'balance-sizes'
- 
+
 # Reset the workspace layout
 r = ['flatten-workspace-tree', 'mode main']
 
@@ -106,8 +106,8 @@ run = ['layout tiling', 'move-node-to-workspace 2']
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Proton'
-run = ['layout tiling', 'move-node-to-workspace 4']
+run = ['layout tiling', 'move-node-to-workspace 3']
 
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
-run = ['layout tiling', 'move-node-to-workspace 5']
+run = ['layout tiling', 'move-node-to-workspace 4']
