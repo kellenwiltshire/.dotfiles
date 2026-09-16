@@ -42,6 +42,8 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 - `tmux` — config and session picker are [below](#tmux)
 - `bun`
 - `go`
+- [Posting](https://posting.sh/) (`posting`) — terminal API client; a formula on macOS, AUR-only
+  on Arch, so `yay` in `runs/05-arch-packages.sh` is what installs it there
 - [Cursor CLI](https://cursor.com/docs/cli) (`cursor-agent`) — macOS only; the `cursor-cli`
   cask is `depends_on :macos`, so there's no Linux equivalent in `arch-packages.txt`
 - [Neovim](https://neovim.io/) — config layout is [below](#neovim)

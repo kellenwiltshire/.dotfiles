@@ -18,6 +18,7 @@ neovim
 noto-fonts-extra
 omarchy-chromium
 openbsd-netcat
+posting
 python-pip
 qt5-wayland
 rust

@@ -60,6 +60,8 @@ brew "librsvg"
 brew "neovim"
 # Package compiler and linker metadata toolkit
 brew "pkgconf"
+# Modern API client that lives in your terminal
+brew "posting"
 # Easily download, build, install, upgrade, and uninstall Python packages
 brew "python-setuptools"
 # Interpreted, interactive, object-oriented programming language
