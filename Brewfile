@@ -112,6 +112,4 @@ cask "proton-mail"
 cask "raycast"
 # Music streaming service
 cask "spotify"
-# System monitor for the menu bar
-cask "stats"
 npm "corepack"
