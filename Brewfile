@@ -58,6 +58,8 @@ brew "pango"
 brew "librsvg"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# Prompt theme engine for any shell
+brew "oh-my-posh"
 # Package compiler and linker metadata toolkit
 brew "pkgconf"
 # Modern API client that lives in your terminal

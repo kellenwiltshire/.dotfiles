@@ -31,7 +31,8 @@ On Linux (Omarchy), `packages/arch-packages.txt` plays the same role for your _a
 packages — see [Arch/Omarchy packages](#archomarchy-packages).
 
 - `zsh` + [Oh My Zsh](https://ohmyz.sh/) and plugins (autosuggestions, syntax-highlighting, zsh-bat, you-should-use, fzf-tab)
-- [Spaceship](https://spaceship-prompt.sh/) prompt theme
+- [Oh My Posh](https://ohmyposh.dev/) prompt — the [Zen](https://github.com/dreamsofautonomy/zen-omp) theme in `shared/.config/oh-my-posh/config.omp.toml`;
+  AUR-only on Arch, so `yay` in `runs/05-arch-packages.sh` is what installs it there
 - `zoxide` (smarter `cd`), `fzf` (with `Ctrl-R`/`Ctrl-T`/`Alt-C` keybindings), `direnv`
 - [carapace](https://carapace.sh/) argument completion — see [Completions](#completions)
 - Modern CLI tools: `bat`, `eza`, `fd`, `ripgrep`, `jq`, `git-delta`, `lazygit`, `tealdeer` (`tldr`), `btop`
@@ -513,7 +514,6 @@ executable file in `runs/` in order:
 | `06-create-code-dir.sh`     | Ensure `~/code` exists                                |
 | `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)                       |
 | `20-install-zsh-plugins.sh` | Zsh plugins                                           |
-| `30-install-spaceship.sh`   | Spaceship prompt theme                                |
 | `40-install-nvm.sh`         | `nvm` + Node LTS                                      |
 | `50-install-docker.sh`      | Docker CLI, `buildx`, `compose`                       |
 | `55-install-ghostty.sh`     | Ghostty terminal                                      |
