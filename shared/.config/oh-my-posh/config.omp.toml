@@ -7,6 +7,7 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
 [palette]
   blue = '#82aaff'
   cyan = '#7fdbca'
+  green = '#addb67'
   grey = '#637777'
   orange = '#f78c6c'
   purple = '#c792ea'
@@ -26,6 +27,16 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
 
     [blocks.segments.options]
       style = 'full'
+
+  [[blocks.segments]]
+    type = 'node'
+    style = 'plain'
+    foreground = 'p:green'
+    background = 'transparent'
+    template = ' {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}'
+
+    [blocks.segments.options]
+      fetch_package_manager = true
 
   [[blocks.segments]]
     type = 'git'
