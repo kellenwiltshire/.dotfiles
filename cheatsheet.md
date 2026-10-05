@@ -9,7 +9,7 @@ any of it is the way it is.
 | --- | --- |
 | `./setup.sh` | Run every step for the detected OS |
 | `./setup.sh <filter>` | Run only steps whose path matches, e.g. `./setup.sh docker` |
-| `./setup.sh --macos` / `--linux` | Force an OS instead of auto-detecting (`-m` / `-l`) |
+| `./setup.sh --macos` / `--linux` / `--debian` | Override OS or distro detection (`-m` / `-l` for the first two) |
 | `./setup.sh stow-home` | Re-symlink dotfiles, pruning orphans and backing up conflicts |
 | `./setup.sh ssh-allowed-signers` | Rewrite `~/.ssh/allowed_signers` after adding a key |
 | `dots` | Open this repo in `$EDITOR_CMD` |

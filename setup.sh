@@ -6,11 +6,13 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 filter=""
 os=""
+distro="${DOTFILES_DISTRO:-}"
 
 for arg in "$@"; do
   case "$arg" in
     --macos|-m) os="macos" ;;
     --linux|-l) os="linux" ;;
+    --debian) os="linux"; distro="debian" ;;
     *) filter="$arg" ;;
   esac
 done
@@ -22,9 +24,15 @@ if [[ -z "$os" ]]; then
   esac
 fi
 
-export DOTFILES_OS="$os"
+if [[ "$os" == "linux" && -z "$distro" && -r /etc/os-release ]]; then
+  distro="$(. /etc/os-release && printf '%s' "${ID:-linux}")"
+fi
 
-echo "$script_dir -- os=$DOTFILES_OS filter=$filter"
+export DOTFILES_OS="$os"
+export DOTFILES_DISTRO="$distro"
+export PATH="$HOME/.local/bin:$PATH"
+
+echo "$script_dir -- os=$DOTFILES_OS distro=${DOTFILES_DISTRO:-n/a} filter=$filter"
 
 cd "$script_dir"
 

@@ -2,10 +2,15 @@
 
 set -euo pipefail
 
-echo "👻 Installing Ghostty..."
-
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$script_dir/../scripts/lib.sh"
+
+if [[ "$(detect_distro)" == "debian" ]]; then
+  echo "⏭️  Skipping Ghostty (terminal-only Debian)."
+  exit 0
+fi
+
+echo "👻 Installing Ghostty..."
 
 if command -v ghostty >/dev/null 2>&1; then
   echo "✅ ghostty already installed."

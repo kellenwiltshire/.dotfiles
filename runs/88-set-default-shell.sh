@@ -28,7 +28,7 @@ echo "🐚 Setting zsh ($zsh_path) as the default shell..."
 
 if ! grep -qxF "$zsh_path" /etc/shells 2>/dev/null; then
   echo "   Adding $zsh_path to /etc/shells (needs sudo)..."
-  echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+  echo "$zsh_path" | run_as_root tee -a /etc/shells >/dev/null
 fi
 
 if chsh -s "$zsh_path"; then

@@ -15,9 +15,8 @@ fi
 
 if command -v brew >/dev/null 2>&1; then
   install_brew_package go
-elif command -v apt >/dev/null 2>&1; then
-  sudo apt update
-  sudo apt install -y golang-go
+elif command -v apt-get >/dev/null 2>&1; then
+  install_package go golang-go
 elif command -v dnf >/dev/null 2>&1; then
   sudo dnf install -y golang
 elif command -v pacman >/dev/null 2>&1; then

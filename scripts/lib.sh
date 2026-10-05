@@ -14,6 +14,92 @@ detect_os() {
 
 DOTFILES_OS="$(detect_os)"
 export DOTFILES_OS
+export PATH="$HOME/.local/bin:$PATH"
+
+detect_distro() {
+  if [[ -n "${DOTFILES_DISTRO:-}" ]]; then
+    echo "$DOTFILES_DISTRO"
+    return
+  fi
+
+  if [[ "$(detect_os)" == "linux" && -r /etc/os-release ]]; then
+    (. /etc/os-release && printf '%s\n' "${ID:-linux}")
+    return
+  fi
+
+  echo ""
+}
+
+DOTFILES_DISTRO="$(detect_distro)"
+export DOTFILES_DISTRO
+
+run_as_root() {
+  if [[ "$EUID" -eq 0 ]]; then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
+apt_index_updated=false
+
+ensure_apt_index() {
+  [[ "$apt_index_updated" == "true" ]] && return
+  run_as_root apt-get update
+  apt_index_updated=true
+}
+
+apt_has_package() {
+  ensure_apt_index
+  apt-cache show "$1" >/dev/null 2>&1
+}
+
+version_at_least() {
+  printf '%s\n%s\n' "$2" "$1" | sort -V -C
+}
+
+github_latest_release_tag() {
+  local repo="$1"
+  local release_url
+
+  release_url="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest")"
+  basename "$release_url"
+}
+
+download_executable() {
+  local url="$1"
+  local target="$2"
+  local download
+
+  mkdir -p "$(dirname "$target")"
+  download="$(mktemp)"
+  curl -fsSL "$url" -o "$download"
+  install -m 755 "$download" "$target"
+  rm -f "$download"
+}
+
+install_tar_binary() {
+  local url="$1"
+  local binary_name="$2"
+  local target="${3:-$HOME/.local/bin/$binary_name}"
+  local archive extract_dir binary
+
+  archive="$(mktemp)"
+  extract_dir="$(mktemp -d)"
+  curl -fsSL "$url" -o "$archive"
+  tar -xzf "$archive" -C "$extract_dir"
+  binary="$(find "$extract_dir" -type f -name "$binary_name" -print -quit)"
+
+  if [[ -z "$binary" ]]; then
+    rm -rf "$archive" "$extract_dir"
+    echo "Could not find $binary_name in $url." >&2
+    return 1
+  fi
+
+  mkdir -p "$(dirname "$target")"
+  install -m 755 "$binary" "$target"
+  rm -rf "$archive" "$extract_dir"
+}
 
 # A just-installed Homebrew is not on PATH yet, and setup.sh runs each runs/ script as its own
 # process, so the shellenv eval in 00-install-homebrew.sh cannot reach the scripts after it.
@@ -48,9 +134,9 @@ install_package() {
 
   if command -v brew >/dev/null 2>&1; then
     brew install "$package_name"
-  elif command -v apt >/dev/null 2>&1; then
-    sudo apt update
-    sudo apt install -y "$package_name"
+  elif command -v apt-get >/dev/null 2>&1; then
+    ensure_apt_index
+    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$package_name"
   elif command -v dnf >/dev/null 2>&1; then
     sudo dnf install -y "$package_name"
   elif command -v pacman >/dev/null 2>&1; then

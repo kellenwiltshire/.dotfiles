@@ -27,8 +27,10 @@ updates an app in the background `brew bundle check` reports drift forever. They
 IT. Don't re-add them: this note is here rather than in the `Brewfile` because `brewdump`
 rewrites that file from scratch.
 
-On Linux (Omarchy), `packages/arch-packages.txt` plays the same role for your _added_
-packages — see [Arch/Omarchy packages](#archomarchy-packages).
+On Arch/Omarchy, `packages/arch-packages.txt` plays the same role for your _added_
+packages — see [Arch/Omarchy packages](#archomarchy-packages). Debian uses `apt` where
+the package is current and installs newer release binaries under `~/.local` when stable's
+package is missing or too old.
 
 - `zsh` + [Oh My Zsh](https://ohmyz.sh/) and plugins (autosuggestions, syntax-highlighting, zsh-bat, you-should-use, fzf-tab)
 - [Oh My Posh](https://ohmyposh.dev/) prompt — the [Zen](https://github.com/dreamsofautonomy/zen-omp) theme in `shared/.config/oh-my-posh/config.omp.toml`;
@@ -39,7 +41,7 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 - `nvm` + Node LTS
 - Docker tooling: CLI, `buildx`, `compose`
 - `lazydocker`
-- [Ghostty](https://ghostty.org/) terminal (set as default on Linux)
+- [Ghostty](https://ghostty.org/) terminal (set as default on desktop Linux; skipped on Debian)
 - `tmux` — config and session picker are [below](#tmux)
 - `bun`
 - `go`
@@ -50,7 +52,8 @@ packages — see [Arch/Omarchy packages](#archomarchy-packages).
 - [Neovim](https://neovim.io/) — config layout is [below](#neovim)
 
 On Linux these modern CLI tools are installed by `runs/00-install-packages.sh` for parity, so
-the shared `zsh`/`git` config never points at a missing binary.
+the shared `zsh`/`git` config never points at a missing binary. Debian also gets `tmux`,
+`direnv`, `gh`, Carapace, and Oh My Posh there instead of relying on an Omarchy base install.
 
 ## Updating
 
@@ -95,12 +98,14 @@ Notes:
 
 ## Usage
 
-Clone the repo, `cd` into it, and run `./setup.sh`. When it finishes, refresh `~/.zshrc`.
+Clone the repo, `cd` into it, and run `./setup.sh`. Debian is detected from
+`/etc/os-release`; `./setup.sh --debian` is available as an explicit override. When it
+finishes, refresh `~/.zshrc`.
 
-A filter argument runs only the steps whose path matches it, and `--macos`/`--linux` override
-the `uname` detection — see the [cheatsheet](cheatsheet.md#dotfiles-maintenance). Each step
-picks the right package manager automatically (`brew`, `apt`, `dnf`, or `pacman`), so the same
-command works on both machines.
+A filter argument runs only the steps whose path matches it, and
+`--macos`/`--linux`/`--debian` override detection — see the
+[cheatsheet](cheatsheet.md#dotfiles-maintenance). Each step picks the right package manager
+automatically (`brew`, `apt`, `dnf`, or `pacman`).
 
 ## Manual steps after setup
 
@@ -132,6 +137,12 @@ still need a human:
 - Edit `linux/.config/hypr/monitors.lua` if the machine's hardware differs. NVIDIA no longer
   needs anything here: Omarchy 4.0 detects the GPU and sets the env vars in
   `default/hypr/nvidia.lua`.
+
+### Debian
+
+- Log out/in for the `zsh` login-shell change and Docker group membership to take effect.
+- Hyprland and Ghostty are skipped; only the shared terminal config and Linux Git identity
+  are stowed.
 
 ## Window management
 
@@ -508,15 +519,15 @@ executable file in `runs/` in order:
 | Script                      | Purpose                                               |
 | --------------------------- | ----------------------------------------------------- |
 | `00-install-homebrew.sh`    | Bootstrap Homebrew (macOS only)                       |
-| `00-install-packages.sh`    | `zsh`, `stow`, `zoxide`                               |
+| `00-install-packages.sh`    | Shared CLI tools and Debian release binaries           |
 | `05-brew-bundle.sh`         | Install everything in `Brewfile` (macOS only)         |
-| `05-arch-packages.sh`       | Install `packages/arch-packages.txt` (Linux only)     |
+| `05-arch-packages.sh`       | Install `packages/arch-packages.txt` (Arch only)      |
 | `06-create-code-dir.sh`     | Ensure `~/code` exists                                |
 | `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)                       |
 | `20-install-zsh-plugins.sh` | Zsh plugins                                           |
 | `40-install-nvm.sh`         | `nvm` + Node LTS                                      |
 | `50-install-docker.sh`      | Docker CLI, `buildx`, `compose`                       |
-| `55-install-ghostty.sh`     | Ghostty terminal                                      |
+| `55-install-ghostty.sh`     | Ghostty terminal (skipped on Debian)                   |
 | `60-install-bun.sh`         | `bun`                                                 |
 | `70-install-go.sh`          | `go`                                                  |
 | `80-install-lazydocker.sh`  | `lazydocker`                                          |
@@ -540,7 +551,7 @@ Dotfiles are split into three `stow` packages:
 | --------- | ------------------------------------------------------------------------------------------------------------------ | --------- |
 | `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty, tmux, Neovim, `.local/bin`                            | always    |
 | `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases), Ghostty `config-local` | macOS     |
-| `linux/`  | `.gitconfig` (personal email), Hyprland (`.config/hypr`)                                                           | Linux     |
+| `linux/`  | `.gitconfig` (personal email), plus Hyprland on non-Debian Linux                                                 | Linux     |
 
 `shared/.zshrc` sources `~/.zshrc.local` if present, so machine- or work-specific aliases
 live in `macos/.zshrc.local` and are only stowed on macOS.

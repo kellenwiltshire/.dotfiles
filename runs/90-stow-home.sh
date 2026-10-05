@@ -33,6 +33,10 @@ prune_orphans() {
   local entry target link dest
 
   while IFS= read -r entry; do
+    if [[ "$(detect_distro)" == "debian" && "$package" == "linux" && "$entry" == "linux/.config" ]]; then
+      continue
+    fi
+
     target="$HOME/$(basename "$entry")"
     [[ -e "$target" || -L "$target" ]] || continue
 
@@ -55,6 +59,10 @@ prune_orphans() {
 backup_conflicts() {
   local package="$1"
   while IFS= read -r src; do
+    if [[ "$(detect_distro)" == "debian" && "$src" == "linux/.config/hypr/"* ]]; then
+      continue
+    fi
+
     local rel="${src#"$package"/}"
     local target="$HOME/$rel"
     local src_abs="$repo_root/$src"
@@ -79,5 +87,9 @@ for package in "${packages[@]}"; do
   echo "🔗 Stowing $package dotfiles..."
   prune_orphans "$package"
   backup_conflicts "$package"
-  stow --no-folding --restow --verbose "$package"
+  if [[ "$(detect_distro)" == "debian" && "$package" == "linux" ]]; then
+    stow --no-folding --restow --verbose --ignore='^\.config/hypr' "$package"
+  else
+    stow --no-folding --restow --verbose "$package"
+  fi
 done

@@ -110,8 +110,10 @@ lzw() {
   local dir="${1:-$PWD}"
   if [[ "$(uname)" == Darwin ]]; then
     open -na Ghostty.app --args --working-directory="$dir" -e lazygit
-  else
+  elif command -v ghostty >/dev/null; then
     ghostty --working-directory="$dir" -e lazygit &!
+  else
+    (cd "$dir" && lazygit)
   fi
 }
 
@@ -229,4 +231,5 @@ if whence -p brew >/dev/null; then
   fi
   unset _brewup_stamp
 fi
-. /opt/homebrew/bin/hs-opskit-rc-zsh
+
+[[ -r /opt/homebrew/bin/hs-opskit-rc-zsh ]] && . /opt/homebrew/bin/hs-opskit-rc-zsh
