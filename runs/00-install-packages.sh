@@ -19,6 +19,13 @@ if [[ "$(detect_distro)" == "debian" ]]; then
   install_package curl
   install_package unzip
   install_package cc build-essential
+  install_package python3
+  install_package pip3 python3-pip
+  if ! dpkg-query -W -f='${Status}' python3-venv 2>/dev/null |
+    grep -qx 'install ok installed'; then
+    ensure_apt_index
+    run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y python3-venv
+  fi
   install_package batcat bat
   install_package fdfind fd-find
   install_package rg ripgrep
