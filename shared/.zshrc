@@ -1,5 +1,7 @@
 [[ "$ZSH_SESSION" == fe-dev ]] && FE_DEV=1
 
+export PATH="$HOME/.local/bin:$PATH"
+
 if [[ -f "/opt/homebrew/bin/brew" ]]; then
   # If you're using macOS, you'll want this enabled
   eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -35,9 +37,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Go (binaries installed via `go install`)
 export PATH="$HOME/go/bin:$PATH"
-
-# Stowed personal scripts, e.g. tmux-sessionx
-export PATH="$HOME/.local/bin:$PATH"
 
 # EDITOR_CMD is the bare command; EDITOR adds --wait for GUI editors so git blocks
 # until the buffer is closed.
