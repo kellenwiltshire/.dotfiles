@@ -1,4 +1,4 @@
-tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
+tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae", trusted: true
 tap "hashicorp/tap"
 tap "hootsuite/homebrew", "hootsuite@hootsuite.ghe.com:hootsuite/homebrew.git", trusted: true
 tap "nikitabobko/tap", trusted: true
@@ -100,8 +100,6 @@ brew "hootsuite/homebrew/hs-opskit"
 brew "hootsuite/homebrew/hs-minikube@2"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace", trusted: true
-# Write, edit, and chat about your code with AI
-cask "cursor"
 # Command-line agent for Cursor
 cask "cursor-cli"
 # Terminal emulator that uses platform-native UI and GPU acceleration
