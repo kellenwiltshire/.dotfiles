@@ -100,8 +100,6 @@ brew "hootsuite/homebrew/hs-opskit"
 brew "hootsuite/homebrew/hs-minikube@2"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace", trusted: true
-# Command-line agent for Cursor
-cask "cursor-cli"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Open-source cross-platform alternative to AirDrop

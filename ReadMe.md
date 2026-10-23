@@ -12,7 +12,7 @@ explains why things are set up the way they are.
 ## What gets installed
 
 On macOS, `Brewfile` is the source of truth for CLI tools and GUI apps (AeroSpace, Cursor,
-Ghostty, Raycast, Spotify, Proton Mail). No fonts: Ghostty renders in the Nerd Font-patched
+Ghostty, Spotify, Proton Mail). No fonts: Ghostty renders in the Nerd Font-patched
 JetBrains Mono it bundles, which is the only place a font matters here. After installing
 new things, refresh it
 with the `brewdump` alias (or run `scripts/update-brewfile.sh`), then review the diff and
@@ -24,8 +24,9 @@ by Jamf and owned by `root` in `/Applications`. Homebrew had _adopted_ them (see
 `brew upgrade --cask` fails on a root-owned bundle and leaves a multi-GB staging copy
 behind. Worse, brew compares against its own install receipt, so once Keystone or Jamf
 updates an app in the background `brew bundle check` reports drift forever. They're left to
-IT. Don't re-add them: this note is here rather than in the `Brewfile` because `brewdump`
-rewrites that file from scratch.
+IT. Raycast is also left out: `brewup` kept breaking it, so it's installed and updated
+manually from raycast.com. Don't re-add any of them: this note is here rather than in the
+`Brewfile` because `brewdump` rewrites that file from scratch.
 
 On Arch/Omarchy, `packages/arch-packages.txt` plays the same role for your _added_
 packages — see [Arch/Omarchy packages](#archomarchy-packages). Debian uses `apt` where
@@ -47,8 +48,10 @@ package is missing or too old.
 - `go`
 - [Posting](https://posting.sh/) (`posting`) — terminal API client; a formula on macOS, AUR-only
   on Arch, so `yay` in `runs/05-arch-packages.sh` is what installs it there
-- [Cursor CLI](https://cursor.com/docs/cli) (`cursor-agent`) — macOS only; the `cursor-cli`
-  cask is `depends_on :macos`, so there's no Linux equivalent in `arch-packages.txt`
+- [Cursor CLI](https://cursor.com/docs/cli) (`cursor-agent`) — macOS only. Cursor's own
+  installer puts it in `~/.local/bin` and it updates itself. Not the `cursor-cli` cask:
+  `brewup` and the self-updater both manage the same install, and the cask copy ended up
+  missing its bundled `node`
 - [Neovim](https://neovim.io/) — config layout is [below](#neovim)
 
 On Linux these modern CLI tools are installed by `runs/00-install-packages.sh` for parity, so
@@ -432,7 +435,7 @@ Beyond the language layers, the enabled extras are `dap.core`, `test.core`, `ai.
 local overrides, which is all `lua/plugins/` holds besides the theme. `ai.lua` disables
 Sidekick's Next Edit Suggestions, because those need a Copilot subscription and enabling them
 also starts a `copilot` LSP client; the half that is used is the CLI terminal, which drives the
-`cursor-agent` binary from the `cursor-cli` cask. `test.lua` adds the jest, vitest and
+`cursor-agent` binary in `~/.local/bin`. `test.lua` adds the jest, vitest and
 Playwright adapters, because `test.core` ships neotest with no JavaScript adapter at all.
 Debugging needs no override — `lang.typescript` already registers the node and chrome adapters
 and reads `.vscode/launch.json`, so existing launch configs work untouched.
