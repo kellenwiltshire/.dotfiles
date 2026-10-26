@@ -1,3 +1,7 @@
+config-version = 2
+
+persistent-workspaces = ['1', '2', '3', '4', '5']
+
 after-login-command = []
 
 after-startup-command = ['exec-and-forget open -a Ghostty.app']
@@ -24,10 +28,10 @@ preset = 'qwerty'
 [gaps]
 inner.horizontal = 6
 inner.vertical = 6
-outer.left = 6
-outer.bottom = 6
-outer.top = 6
-outer.right = 6
+outer.left = 2
+outer.bottom = 2
+outer.top = 2
+outer.right = 2
 
 [mode.main.binding]
 
