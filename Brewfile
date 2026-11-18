@@ -28,6 +28,8 @@ brew "docker-compose"
 brew "eza"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
+# Play, record, convert, and stream select audio and video codecs
+brew "ffmpeg"
 # Collection of GNU find, xargs, and locate
 brew "findutils"
 # Command-line fuzzy finder written in Go
@@ -58,6 +60,10 @@ brew "pango"
 brew "librsvg"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# Port scanning utility for large networks
+brew "nmap"
+# Open-source, cross-platform JavaScript runtime environment
+brew "node@24"
 # Prompt theme engine for any shell
 brew "oh-my-posh"
 # Package compiler and linker metadata toolkit

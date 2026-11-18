@@ -25,6 +25,7 @@ qt5-wayland
 rust
 signal-desktop
 solaar
+sound-theme-freedesktop
 stow
 ttf-cascadia-mono-nerd
 typora

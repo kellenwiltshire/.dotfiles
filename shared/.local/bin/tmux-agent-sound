@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Played by tmux.conf's pane-title-changed hook when an agent stops working. The Linux sounds come
+# from sound-theme-freedesktop, which packages/arch-packages.txt installs.
+
+state=${1:-}
+
+case "$(uname -s):$state" in
+  Darwin:done | Darwin:question) exec afplay /System/Library/Sounds/Pop.aiff ;;
+  *:done) exec pw-play /usr/share/sounds/freedesktop/stereo/complete.oga ;;
+  *:question) exec pw-play /usr/share/sounds/freedesktop/stereo/message-new-instant.oga ;;
+  *)
+    echo "usage: tmux-agent-sound done|question (got '$state')" >&2
+    exit 1
+    ;;
+esac
