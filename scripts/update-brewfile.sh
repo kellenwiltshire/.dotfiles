@@ -16,7 +16,10 @@ echo "🍺 Refreshing $brewfile from current Homebrew state..."
 # --list-extensions`, which blocks indefinitely whenever the VS Code CLI cannot reach the app.
 # The description comments above each entry are Homebrew 7's default. `--describe` used to ask for
 # them and is now a hard error, so naming it here would abort every dump.
-brew bundle dump --force --no-vscode --file="$brewfile"
+#
+# brew bundle resolves `npm` from PATH, where fnm's Node shadows Homebrew's. The Brewfile's `npm`
+# entries belong to Homebrew's Node, so dumping through fnm's would silently drop them.
+PATH="$(brew --prefix)/bin:$PATH" brew bundle dump --force --no-vscode --file="$brewfile"
 
 # Homebrew 4 serves these two through its JSON API and refuses to tap them, so dumping them from a
 # machine that still has them tapped locally produces a Brewfile that dies on any fresh install.

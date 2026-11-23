@@ -11,21 +11,22 @@ explains why things are set up the way they are.
 
 ## What gets installed
 
-On macOS, `Brewfile` is the source of truth for CLI tools and GUI apps (AeroSpace, Cursor,
-Ghostty, Spotify, Proton Mail). No fonts: Ghostty renders in the Nerd Font-patched
+On macOS, `Brewfile` is the source of truth for CLI tools and GUI apps (AeroSpace, Ghostty,
+Spotify, Proton Mail). No fonts: Ghostty renders in the Nerd Font-patched
 JetBrains Mono it bundles, which is the only place a font matters here. After installing
 new things, refresh it
 with the `brewdump` alias (or run `scripts/update-brewfile.sh`), then review the diff and
 commit.
 
-**Not in the Brewfile on purpose:** Chrome, Firefox, Slack and Docker Desktop are deployed
+**Not in the Brewfile on purpose:** Chrome, Firefox, Slack, Cursor and Docker Desktop are deployed
 by Jamf and owned by `root` in `/Applications`. Homebrew had _adopted_ them (see
 `HOMEBREW_CASK_OPTS=--adopt` in `runs/05-brew-bundle.sh`) but could never upgrade them —
 `brew upgrade --cask` fails on a root-owned bundle and leaves a multi-GB staging copy
 behind. Worse, brew compares against its own install receipt, so once Keystone or Jamf
 updates an app in the background `brew bundle check` reports drift forever. They're left to
 IT. Raycast is also left out: `brewup` kept breaking it, so it's installed and updated
-manually from raycast.com. Don't re-add any of them: this note is here rather than in the
+manually from raycast.com. Stats is out for a similar reason: it updates itself, which left
+Homebrew's install record empty. Don't re-add any of them: this note is here rather than in the
 `Brewfile` because `brewdump` rewrites that file from scratch.
 
 On Arch/Omarchy, `packages/arch-packages.txt` plays the same role for your _added_
@@ -39,7 +40,7 @@ package is missing or too old.
 - `zoxide` (smarter `cd`), `fzf` (with `Ctrl-R`/`Ctrl-T`/`Alt-C` keybindings), `direnv`
 - [carapace](https://carapace.sh/) argument completion — see [Completions](#completions)
 - Modern CLI tools: `bat`, `eza`, `fd`, `ripgrep`, `jq`, `git-delta`, `lazygit`, `tealdeer` (`tldr`), `btop`
-- `nvm` + Node LTS
+- [fnm](https://github.com/Schniz/fnm) + Node LTS — see [Node & Yarn versions](#node--yarn-versions)
 - Docker tooling: CLI, `buildx`, `compose`
 - `lazydocker`
 - [Ghostty](https://ghostty.org/) terminal (set as default on desktop Linux; skipped on Debian)
@@ -156,10 +157,10 @@ navigation habits. `macos/.aerospace.toml` assigns:
 | --- | ---------------------- |
 | 1   | Terminal (Ghostty)     |
 | 2   | Chat (Slack, Messages) |
-| 4   | Mail (Proton Mail)     |
-| 5   | Music (Spotify)        |
+| 3   | Mail (Proton Mail)     |
+| 4   | Music (Spotify)        |
 
-Nothing claims 3. Browsers are unassigned on purpose, and so is the editor — Neovim runs
+Nothing claims 5. Browsers are unassigned on purpose, and so is the editor — Neovim runs
 inside tmux on workspace 1. Linux mirrors only the workspace 1 rule (`o.window` at the
 bottom of `linux/.config/hypr/hyprland.lua`); everything else opens wherever you launch it,
 per Omarchy's stock defaults — see [Hyprland config](#hyprland-config).
@@ -506,9 +507,20 @@ github.com under Settings → SSH and GPG keys.
 
 ## Node & Yarn versions
 
-`nvm` handles Node per repo via `.nvmrc` (auto-switching on `cd`). Yarn/pnpm are handled by
-[Corepack](https://github.com/nodejs/corepack): setup runs `corepack enable`, and the
-`.zshrc` `nvm` hook re-enables it whenever a new Node version is installed or switched to.
+`fnm` handles Node per repo via `.nvmrc` or `.node-version`, found by searching up from the
+current directory, so a subdirectory of a repo gets the repo's version. A `chpwd` hook in
+`shared/.zshrc` switches on every `cd`, installs a missing version without asking, and drops
+back to the default outside any repo.
+
+It replaced `nvm`, which cost half a second of every shell start. fnm's own `--use-on-cd` hook is
+not used because it prompts before installing rather than just doing it. The default is pinned to
+a concrete version, not an alias: nvm's `lts/*` default silently resolved to nothing once a new
+LTS shipped that wasn't installed, and every shell fell through to Homebrew's `node`.
+
+Yarn/pnpm are handled by [Corepack](https://github.com/nodejs/corepack). Node 25 stopped
+bundling it, so it is installed once rather than per Node version: `npm "corepack"` in the
+`Brewfile` on macOS, and `npm install -g corepack` plus `corepack enable --install-directory
+~/.local/bin` on Linux. Either way the `yarn`/`pnpm` shims run under whichever Node is active.
 In any repo that declares a `"packageManager"` field in `package.json`, `yarn` automatically
 uses that exact version — no manual `yarn set version` needed.
 
@@ -528,7 +540,7 @@ executable file in `runs/` in order:
 | `06-create-code-dir.sh`     | Ensure `~/code` exists                                |
 | `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)                       |
 | `20-install-zsh-plugins.sh` | Zsh plugins                                           |
-| `40-install-nvm.sh`         | `nvm` + Node LTS                                      |
+| `40-install-node.sh`        | `fnm`, Node LTS and Corepack                          |
 | `50-install-docker.sh`      | Docker CLI, `buildx`, `compose`                       |
 | `55-install-ghostty.sh`     | Ghostty terminal (skipped on Debian)                   |
 | `60-install-bun.sh`         | `bun`                                                 |

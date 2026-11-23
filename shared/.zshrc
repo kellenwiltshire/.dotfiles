@@ -55,21 +55,15 @@ case "$EDITOR_CMD" in
 esac
 export VISUAL="$EDITOR"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 # History
-HISTSIZE=5000
+HISTSIZE=100000
 HISTFILE=~/.zsh_history
 SAVEHIST=$HISTSIZE
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
+setopt extended_history
+setopt share_history
 setopt hist_ignore_space
 setopt hist_ignore_all_dups
 setopt hist_save_no_dups
-setopt hist_ignore_dups
 setopt hist_find_no_dups
 
 # Completion styling
@@ -95,7 +89,11 @@ zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 command -v carapace >/dev/null && source <(carapace _carapace)
 
 #Alias
-alias garbageday="git branch | grep -vE '^\*?\s*(main|master|develop)\$' | xargs git branch -D"
+garbageday() {
+  git fetch || return
+  git for-each-ref --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' refs/heads |
+    xargs -r git branch -D
+}
 alias refresh="source ~/.zshrc"
 alias dots="\$EDITOR_CMD ~/.dotfiles"
 alias brewdump="~/.dotfiles/scripts/update-brewfile.sh"
@@ -128,8 +126,12 @@ git() {
 
 if whence -p brew >/dev/null; then
   # Keep the Brewfile in sync after brew changes (leaves it uncommitted to review).
+  # brew bundle resolves `npm` from PATH, and the Brewfile's npm entries belong to Homebrew's
+  # Node rather than fnm's.
   brew() {
-    command brew "$@"
+    local brew_path="$PATH"
+    [[ "$1" == bundle ]] && brew_path="$HOMEBREW_PREFIX/bin:$PATH"
+    PATH="$brew_path" command brew "$@"
     local ret=$?
     if [[ $ret -eq 0 ]]; then
       case "$1" in
@@ -160,7 +162,7 @@ fi
 
 command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
 command -v direnv >/dev/null && eval "$(direnv hook zsh)"
-command -v fzf >/dev/null && eval "$(fzf --zsh 2>/dev/null)"
+command -v fzf >/dev/null && eval "$(fzf --zsh)"
 
 if command -v fd >/dev/null; then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
@@ -180,44 +182,14 @@ if command -v eza >/dev/null; then
 fi
 
 autoload -U add-zsh-hook
-load-nvmrc() {
-  (( _load_nvmrc_running )) && return
-  _load_nvmrc_running=1
-  local nvmrc_path nvmrc_version nvmrc_node_version default_version node_path nvm_node_path
-  nvmrc_path="$(nvm_find_nvmrc)"
-  if [[ -n "$nvmrc_path" ]]; then
-    nvmrc_version="$(tr -d '[:space:]' < "$nvmrc_path")"
-    if [[ -n "$nvmrc_version" ]]; then
-      nvmrc_node_version="$(nvm version "$nvmrc_version")"
-      if [[ "$nvmrc_node_version" == "N/A" ]]; then
-        nvm install "$nvmrc_version"
-        command -v corepack >/dev/null && corepack enable
-        rehash
-      else
-        node_path="$(command -v node 2>/dev/null)"
-        nvm_node_path="$(nvm which current 2>/dev/null)"
-        if [[ "$(nvm version)" != "$nvmrc_node_version" || "$node_path" != "$nvm_node_path" ]]; then
-          nvm use "$nvmrc_version"
-          command -v corepack >/dev/null && corepack enable
-          rehash
-        fi
-      fi
-    fi
-  elif [[ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ]]; then
-    default_version="$(nvm version default 2>/dev/null)"
-    if [[ -n "$default_version" && "$default_version" != "N/A" && "$(nvm version)" != "$default_version" ]]; then
-      echo "Reverting to nvm default version"
-      nvm use default
-      rehash
-    fi
-  fi
-  _load_nvmrc_running=0
-}
-if (( $+functions[nvm_find_nvmrc] )); then
-  add-zsh-hook -d chpwd load-nvmrc 2>/dev/null
-  add-zsh-hook -d precmd nvmrc-sync-node 2>/dev/null
-  add-zsh-hook chpwd load-nvmrc
-  load-nvmrc
+# fnm's own --use-on-cd hook prompts instead of installing a missing .nvmrc version.
+if command -v fnm >/dev/null; then
+  eval "$(fnm env --version-file-strategy=recursive --shell zsh)"
+  use-project-node() {
+    fnm use --install-if-missing --silent-if-unchanged
+  }
+  add-zsh-hook chpwd use-project-node
+  use-project-node
 fi
 
 # Nudge to update Homebrew at most once a week (time-based; no network on startup).

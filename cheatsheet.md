@@ -34,12 +34,11 @@ skips self-updating casks; add `--greedy` to force them.
 | --- | --- |
 | `ls` / `ll` / `la` / `lt` | `eza` listings: plain / long / long+hidden / tree |
 | `v` | `nvim` |
-| `c` | Open the current directory — Cursor on macOS, `$EDITOR_CMD` (nvim) elsewhere |
 | `lz` | `lazygit` |
 | `lzw [dir]` | `lazygit` in a new Ghostty window |
 | `gco` | `git checkout` |
 | `main` / `develop` | Check out that branch and pull |
-| `garbageday` | Delete every local branch except `main`/`master`/`develop` |
+| `garbageday` | Fetch, then delete local branches whose remote branch is gone (merged PRs) |
 
 Oh My Zsh's `git` plugin is loaded, so its aliases (`gst`, `gl`, `gcm`, …) are available too.
 

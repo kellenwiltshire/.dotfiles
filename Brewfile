@@ -1,4 +1,3 @@
-tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae", trusted: true
 tap "hashicorp/tap"
 tap "hootsuite/homebrew", "hootsuite@hootsuite.ghe.com:hootsuite/homebrew.git", trusted: true
 tap "nikitabobko/tap", trusted: true
@@ -32,6 +31,8 @@ brew "fd"
 brew "ffmpeg"
 # Collection of GNU find, xargs, and locate
 brew "findutils"
+# Fast and simple Node.js version manager
+brew "fnm"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # Library and utilities for processing GIFs
@@ -62,8 +63,6 @@ brew "librsvg"
 brew "neovim"
 # Port scanning utility for large networks
 brew "nmap"
-# Open-source, cross-platform JavaScript runtime environment
-brew "node@24"
 # Prompt theme engine for any shell
 brew "oh-my-posh"
 # Package compiler and linker metadata toolkit
@@ -112,8 +111,7 @@ cask "ghostty"
 cask "localsend"
 # Client for Proton Mail and Proton Calendar
 cask "proton-mail"
-# Control your tools with a few keystrokes
-cask "raycast"
 # Music streaming service
 cask "spotify"
+go "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 npm "corepack"
