@@ -77,6 +77,8 @@ brew "python@3.12"
 brew "ripgrep"
 # Build tool for Scala projects
 brew "sbt"
+# Static analysis and lint tool, for (ba)sh scripts
+brew "shellcheck"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
 # Very fast implementation of tldr in Rust

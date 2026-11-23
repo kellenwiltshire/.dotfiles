@@ -200,7 +200,7 @@ second Ghostty instance and reliably leaves a stray shell window behind it.
 ### Ghostty font size
 
 `shared/.config/ghostty/config` ends with `config-file = ?config-local`, and
-`macos/.config/ghostty/config-local` raises `font-size` from 12 to 16 so the Mac's retina
+`macos/.config/ghostty/config-local` raises `font-size` from 12 to 14 so the Mac's retina
 panel matches the apparent size of the Omarchy laptop. Includes are loaded after the file
 that references them, so the override wins wherever it sits, and the leading `?` keeps
 Ghostty quiet on Linux where that file is never stowed.
