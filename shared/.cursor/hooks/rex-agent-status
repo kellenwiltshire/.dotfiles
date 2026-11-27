@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Reports the Cursor agent to its terminal: its state with OSC 7501, the Program Status Protocol that
+# Rex turns into tab indicators, sounds and notifications, and how to resume its chat with OSC 7577,
+# the Program Resume Protocol that Rex uses to bring it back after a restart. Hooks have no
+# controlling terminal, so the sequences go to the terminal of the nearest ancestor that has one.
+
+input=$(cat)
+event=$(jq -r '.hook_event_name' <<<"$input")
+
+case "$event" in
+  beforeSubmitPrompt) state=working ;;
+  stop)
+    case "$(jq -r '.status' <<<"$input")" in
+      error) state=error ;;
+      aborted) state=idle ;;
+      *) state=done ;;
+    esac
+    ;;
+  *)
+    echo "rex-agent-status: unexpected hook event '$event'" >&2
+    exit 1
+    ;;
+esac
+
+agent_and_its_terminal() {
+  local pid=$PPID tty
+  while [[ $pid -gt 1 ]]; do
+    tty=$(ps -o tty= -p "$pid" | tr -d ' ') || return 0
+    if [[ -n $tty && $tty != \?* ]]; then
+      echo "$pid /dev/$tty"
+      return 0
+    fi
+    pid=$(ps -o ppid= -p "$pid" | tr -d ' ') || return 0
+  done
+}
+
+resume_report() {
+  local chat_id=$1 program arg body
+  local encoded_argv=()
+  program=$(basename "$(ps -o comm= -p "$agent_pid")")
+  for arg in "$program" --resume "$chat_id"; do
+    encoded_argv+=("$(printf %s "$arg" | base64)")
+  done
+  body="pid=$agent_pid:time=$(date +%s):argv=$(IFS=,; echo "${encoded_argv[*]}")"
+  printf '\e]7577;%s:mac=%s\e\\' "$body" "$(printf '%s:%s' "$body" "$OSC7577_TOKEN" | shasum -a 256 | cut -d' ' -f1)"
+}
+
+read -r agent_pid terminal <<<"$(agent_and_its_terminal)"
+if [[ -n $terminal && -w $terminal ]]; then
+  {
+    printf '\e]7501;state=%s:app=cursor-agent\e\\' "$state"
+    if [[ -n ${OSC7577_TOKEN:-} ]]; then
+      resume_report "$(jq -er '.conversation_id' <<<"$input")"
+    fi
+  } >"$terminal"
+fi
+
+if [[ $event == beforeSubmitPrompt ]]; then
+  echo '{"continue": true}'
+fi

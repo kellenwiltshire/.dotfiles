@@ -5,27 +5,29 @@ set -euo pipefail
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$script_dir/../scripts/lib.sh"
 
-echo "📦 Installing fnm..."
+nvm_release="v0.41.0"
+export NVM_DIR="$HOME/.nvm"
 
-if command -v fnm >/dev/null 2>&1; then
-  echo "✅ fnm already installed."
-elif [[ "$(detect_distro)" == "debian" ]]; then
-  curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$HOME/.local/bin" --skip-shell
+echo "📦 Installing nvm..."
+
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  echo "✅ nvm already installed."
 else
-  install_package fnm
+  # PROFILE=/dev/null: shared/.zshrc loads nvm itself, so the installer must not append to it.
+  curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_release/install.sh" | PROFILE=/dev/null bash
 fi
 
-eval "$(fnm env --shell bash)"
+source "$NVM_DIR/nvm.sh" --no-use
 
-if default_version="$(fnm default 2>/dev/null)"; then
-  echo "✅ fnm default already set to $default_version; leaving it as-is."
+if default_version="$(nvm version default)" && [[ "$default_version" != "N/A" ]]; then
+  echo "✅ nvm default already set to $default_version; leaving it as-is."
 else
   echo "📦 Installing Node LTS and setting it as the default..."
-  fnm install --lts
-  fnm default lts-latest
+  nvm install --lts
+  nvm alias default "$(nvm version 'lts/*')"
 fi
 
-fnm use default
+nvm use default
 
 # Node 25+ no longer bundles Corepack. On macOS the Brewfile's `npm "corepack"` provides it.
 if command -v corepack >/dev/null 2>&1; then

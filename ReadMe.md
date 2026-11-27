@@ -40,7 +40,7 @@ package is missing or too old.
 - `zoxide` (smarter `cd`), `fzf` (with `Ctrl-R`/`Ctrl-T`/`Alt-C` keybindings), `direnv`
 - [carapace](https://carapace.sh/) argument completion — see [Completions](#completions)
 - Modern CLI tools: `bat`, `eza`, `fd`, `ripgrep`, `jq`, `git-delta`, `lazygit`, `tealdeer` (`tldr`), `btop`
-- [fnm](https://github.com/Schniz/fnm) + Node LTS — see [Node & Yarn versions](#node--yarn-versions)
+- [nvm](https://github.com/nvm-sh/nvm) + Node LTS — see [Node & Yarn versions](#node--yarn-versions)
 - Docker tooling: CLI, `buildx`, `compose`
 - `lazydocker`
 - [Ghostty](https://ghostty.org/) terminal (set as default on desktop Linux; skipped on Debian)
@@ -155,7 +155,7 @@ navigation habits. `macos/.aerospace.toml` assigns:
 
 | WS  | Apps                   |
 | --- | ---------------------- |
-| 1   | Terminal (Ghostty)     |
+| 1   | Terminal (Rex)         |
 | 2   | Chat (Slack, Messages) |
 | 3   | Mail (Proton Mail)     |
 | 4   | Music (Spotify)        |
@@ -189,9 +189,9 @@ put it on workspace 1. tmux is not started for you: attach with `ctrl`+`f`
 
 `cmd`+`Return` gets you back to it on macOS, mirroring Omarchy's stock `super`+`Return`,
 which needs no override. The two behave slightly differently: `super`+`Return` opens another
-Ghostty window, while `cmd`+`Return` runs `open -a Ghostty.app`, which activates the running
-one — and AeroSpace follows the focus to workspace 1. Use Ghostty's own `cmd`+`n` for an
-extra window on macOS.
+Ghostty window, while `cmd`+`Return` runs `open -a Rex.app`, which activates the running
+one — and AeroSpace follows the focus to workspace 1. On macOS, Rex has replaced Ghostty as
+the workspace 1 terminal; Ghostty still tiles if you open it, but isn't pinned anywhere.
 
 macOS has no equivalent of `ghostty -e <command>`, which is why the terminal starts bare
 there. `open -na Ghostty.app --args -e …` is the documented substitute, but `-n` forks a
@@ -507,15 +507,18 @@ github.com under Settings → SSH and GPG keys.
 
 ## Node & Yarn versions
 
-`fnm` handles Node per repo via `.nvmrc` or `.node-version`, found by searching up from the
-current directory, so a subdirectory of a repo gets the repo's version. A `chpwd` hook in
-`shared/.zshrc` switches on every `cd`, installs a missing version without asking, and drops
-back to the default outside any repo.
+`nvm` handles Node per repo via `.nvmrc`, found by searching up from the current directory, so a
+subdirectory of a repo gets the repo's version. `.node-version` files are not read. A `chpwd`
+hook in `shared/.zshrc` switches on every `cd`, installs a missing version without asking, and
+drops back to the default outside any repo. The hook skips nvm entirely when the requested
+version hasn't changed, so moving around inside a repo stays fast; loading nvm adds about 160ms
+to each shell start.
 
-It replaced `nvm`, which cost half a second of every shell start. fnm's own `--use-on-cd` hook is
-not used because it prompts before installing rather than just doing it. The default is pinned to
-a concrete version, not an alias: nvm's `lts/*` default silently resolved to nothing once a new
-LTS shipped that wasn't installed, and every shell fell through to Homebrew's `node`.
+It replaced fnm because some workflows need nvm itself, not just `.nvmrc` support. It is
+installed with nvm's official script into `~/.nvm` on every OS, at the release pinned in
+`runs/40-install-node.sh`; Homebrew's `nvm` formula is unsupported upstream. The default is
+pinned to a concrete version, not an alias: an `lts/*` default silently resolves to nothing once
+a new LTS ships that isn't installed, and every shell falls through to Homebrew's `node`.
 
 Yarn/pnpm are handled by [Corepack](https://github.com/nodejs/corepack). Node 25 stopped
 bundling it, so it is installed once rather than per Node version: `npm "corepack"` in the
@@ -540,7 +543,7 @@ executable file in `runs/` in order:
 | `06-create-code-dir.sh`     | Ensure `~/code` exists                                |
 | `10-install-oh-my-zsh.sh`   | Oh My Zsh (installs or updates)                       |
 | `20-install-zsh-plugins.sh` | Zsh plugins                                           |
-| `40-install-node.sh`        | `fnm`, Node LTS and Corepack                          |
+| `40-install-node.sh`        | `nvm`, Node LTS and Corepack                          |
 | `50-install-docker.sh`      | Docker CLI, `buildx`, `compose`                       |
 | `55-install-ghostty.sh`     | Ghostty terminal (skipped on Debian)                   |
 | `60-install-bun.sh`         | `bun`                                                 |
@@ -564,7 +567,7 @@ Dotfiles are split into three `stow` packages:
 
 | Package   | Contents                                                                                                           | Stowed on |
 | --------- | ------------------------------------------------------------------------------------------------------------------ | --------- |
-| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty, tmux, Neovim, `.local/bin`                            | always    |
+| `shared/` | `.zshrc`, `.gitconfig-common`, `.gitignore_global`, Ghostty, Rex, tmux, Neovim, Cursor hooks, `.local/bin`         | always    |
 | `macos/`  | `.gitconfig` (work email), `.ssh/config`, `.aerospace.toml`, `.zshrc.local` (work aliases), Ghostty `config-local` | macOS     |
 | `linux/`  | `.gitconfig` (personal email), plus Hyprland on non-Debian Linux                                                 | Linux     |
 

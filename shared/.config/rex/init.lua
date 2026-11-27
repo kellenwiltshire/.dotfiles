@@ -119,13 +119,13 @@ rex.bind("ctrl+a>g", "lazygit")
 local scratchpad_note = os.getenv("HOME") .. "/notes/scratch.md"
 local scratchpad_socket = (os.getenv("TMPDIR") or "/tmp"):gsub("/$", "") .. "/nvim-scratchpad.sock"
 local attach_to_scratchpad_nvim = [[
-if ! nvim --server "$1" --remote-expr 1 >/dev/null 2>&1; then
+if ! nvim --server "$1" --remote-send '' >/dev/null 2>&1; then
   rm -f "$1"
   mkdir -p "$(dirname "$2")"
   set -m
   SCRATCHPAD_NOTE="$2" nvim --headless --listen "$1" \
     -c 'set autowriteall' \
-    -c 'autocmd CursorHold,FocusLost,BufLeave * silent! wall' \
+    -c 'autocmd CursorHold,CursorHoldI,FocusLost,BufLeave * silent! wall' \
     -c 'autocmd UIEnter * ++once lua vim.schedule(function() vim.cmd.edit(vim.fn.fnameescape(vim.env.SCRATCHPAD_NOTE)) end)' \
     </dev/null >/dev/null 2>&1 &
   while [ ! -S "$1" ]; do
@@ -168,3 +168,163 @@ rex.bind("ctrl+shift+h", "pane.focus", { direction = "left" })
 rex.bind("ctrl+shift+j", "pane.focus", { direction = "down" })
 rex.bind("ctrl+shift+k", "pane.focus", { direction = "up" })
 rex.bind("ctrl+shift+l", "pane.focus", { direction = "right" })
+
+local function file_exists(path)
+  local file = io.open(path)
+  if file == nil then
+    return false
+  end
+  file:close()
+  return true
+end
+
+-- --autostart=false keeps the watcher from spawning a second server while this one is starting up.
+local run_agent_watcher = [[
+exec >>"$HOME/Library/Logs/rex-agent-watcher.log" 2>&1
+attempts=0
+until "$1" --autostart=false whoami >/dev/null 2>&1; do
+  attempts=$((attempts + 1))
+  [ "$attempts" -lt 60 ] || { echo "$(date): Rex server didn't answer; agent watcher not started"; exit 1; }
+  sleep 1
+done
+exec "$1" --autostart=false do "$2" --all
+]]
+
+local rex_cli = os.getenv("HOME")
+  .. "/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS/rex"
+if file_exists(rex_cli) then
+  local lock = (os.getenv("TMPDIR") or "/tmp"):gsub("/$", "") .. "/rex-agent-watcher.lock"
+  local watcher = os.getenv("HOME") .. "/.config/rex/agent-watcher.lua"
+  local _, err = rex.exec.start(
+    { "/usr/bin/lockf", "-s", "-t", "0", lock, "/bin/sh", "-c", run_agent_watcher, "sh", rex_cli, watcher },
+    { detach = true, stdout = false, stderr = false }
+  )
+  if err ~= nil then
+    rex.log("error", "Couldn't start the agent watcher: " .. err)
+  end
+end
+
+-- ~/.cursor/hooks/rex-agent-status reports these. Cursor CLI installs both names.
+for _, cursor_agent in ipairs({ "cursor-agent", "agent" }) do
+  rex.set("resume.trust." .. cursor_agent, { command = { cursor_agent, "--resume", rex.match.uuid } })
+end
+
+-- ~/.config/nvim/lua/config/autocmds.lua reports this. -S runs the file, so only persistence.nvim's sessions.
+rex.set("resume.trust.nvim", { command = { "nvim", "-S", rex.match.under("~/.local/state/nvim/sessions") } })
+
+local home = os.getenv("HOME")
+
+local function output_lines(argv)
+  local result, err = rex.exec(argv)
+  if result == nil then
+    error(err, 0)
+  end
+  if not result.ok then
+    error(argv[1] .. " failed: " .. result.stderr, 0)
+  end
+  local lines = {}
+  for line in result.stdout:gmatch("[^\n]+") do
+    table.insert(lines, line)
+  end
+  return lines
+end
+
+local function first_existing(paths)
+  for _, path in ipairs(paths) do
+    if file_exists(path) then
+      return path
+    end
+  end
+  error("None of these exist: " .. table.concat(paths, ", "), 0)
+end
+
+local function project_directories()
+  local directories = output_lines({
+    "/usr/bin/find",
+    home .. "/code",
+    "-mindepth",
+    "1",
+    "-maxdepth",
+    "1",
+    "-type",
+    "d",
+    "-not",
+    "-name",
+    ".*",
+  })
+  table.sort(directories)
+  local zoxide = first_existing({ "/opt/homebrew/bin/zoxide", "/usr/local/bin/zoxide", "/usr/bin/zoxide" })
+  for _, directory in ipairs(output_lines({ zoxide, "query", "--list" })) do
+    table.insert(directories, directory)
+  end
+  return directories
+end
+
+local function directory_name(directory)
+  return directory:match("[^/]+$")
+end
+
+local function with_tilde(directory)
+  if directory:sub(1, #home) == home then
+    return "~" .. directory:sub(#home + 1)
+  end
+  return directory
+end
+
+local function session_switcher_items(sessions)
+  local items, session_labels, listed_directories = {}, {}, {}
+  for _, session in ipairs(sessions) do
+    session_labels[session.label] = true
+    table.insert(items, { id = session.session_id, title = session.label, icon = "terminal", detail = "session" })
+  end
+  for _, directory in ipairs(project_directories()) do
+    if not listed_directories[directory] and not session_labels[directory_name(directory)] then
+      listed_directories[directory] = true
+      table.insert(
+        items,
+        { id = directory, title = directory_name(directory), subtitle = with_tilde(directory), icon = "folder" }
+      )
+    end
+  end
+  return items
+end
+
+local function new_session_in(directory)
+  local created, err = rex.call("session.create", {
+    label = directory_name(directory),
+    initial_windows = {
+      { layout = rex.layout.block({ flavor = "com.superlogical.terminal.shell", options = { cwd = directory } }) },
+    },
+  })
+  if err ~= nil then
+    error(err, 0)
+  end
+  return created.session_id
+end
+
+rex.action({
+  name = "session_switcher",
+  title = "Switch Session or Open Project",
+  run = function()
+    local listed, err = rex.call("session.list")
+    if err ~= nil then
+      error(err, 0)
+    end
+    local choice, why, detail = rex.ui.pick({
+      title = "Switch session",
+      placeholder = "Filter sessions and projects",
+      items = session_switcher_items(listed.sessions),
+    })
+    if choice == nil then
+      if why == "cancelled" then
+        return
+      end
+      error("Session switcher got no answer: " .. why .. " " .. (detail or ""), 0)
+    end
+    if choice:sub(1, 1) == "/" then
+      choice = new_session_in(choice)
+    end
+    rex.client.queue("session.select", { session_id = choice })
+  end,
+})
+rex.bind("ctrl+a>s", "session_switcher")

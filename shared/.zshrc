@@ -127,7 +127,7 @@ git() {
 if whence -p brew >/dev/null; then
   # Keep the Brewfile in sync after brew changes (leaves it uncommitted to review).
   # brew bundle resolves `npm` from PATH, and the Brewfile's npm entries belong to Homebrew's
-  # Node rather than fnm's.
+  # Node rather than nvm's.
   brew() {
     local brew_path="$PATH"
     [[ "$1" == bundle ]] && brew_path="$HOMEBREW_PREFIX/bin:$PATH"
@@ -182,11 +182,23 @@ if command -v eza >/dev/null; then
 fi
 
 autoload -U add-zsh-hook
-# fnm's own --use-on-cd hook prompts instead of installing a missing .nvmrc version.
-if command -v fnm >/dev/null; then
-  eval "$(fnm env --version-file-strategy=recursive --shell zsh)"
+export NVM_DIR="$HOME/.nvm"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+  # Sourcing nvm.sh already activates the default alias.
+  _project_node=default
   use-project-node() {
-    fnm use --install-if-missing --silent-if-unchanged
+    local wanted=default nvmrc_path="$(nvm_find_nvmrc)"
+    if [[ -n "$nvmrc_path" ]]; then
+      wanted="$(nvm_process_nvmrc "$nvmrc_path")" || return
+    fi
+    [[ "$wanted" == "$_project_node" ]] && return
+    if [[ "$(nvm version "$wanted")" == N/A ]]; then
+      nvm install "$wanted" || return
+    else
+      nvm use "$wanted" || return
+    fi
+    _project_node="$wanted"
   }
   add-zsh-hook chpwd use-project-node
   use-project-node
@@ -204,3 +216,8 @@ if whence -p brew >/dev/null; then
 fi
 
 [[ -r /opt/homebrew/bin/hs-opskit-rc-zsh ]] && . /opt/homebrew/bin/hs-opskit-rc-zsh
+
+# Last, so the rex CLI matching the running server wins over any other copy on PATH.
+if [[ -n $REX_BIN_DIR ]]; then
+  export PATH="$REX_BIN_DIR:$PATH"
+fi

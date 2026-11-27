@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/cursor-hooks@latest/schema/hooks.schema.json",
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [{ "command": "./hooks/rex-agent-status", "timeout": 5 }],
+    "stop": [{ "command": "./hooks/rex-agent-status", "timeout": 5 }]
+  }
+}

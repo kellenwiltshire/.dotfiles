@@ -47,7 +47,7 @@ echo "🍺 Installing from Brewfile..."
 # There is no --no-vscode here: unlike `dump`, the install subcommand rejects it outright. Keeping
 # `vscode` lines out of the Brewfile is what stops brew from driving the hang-prone `code` CLI.
 #
-# setup.sh inherits the calling shell's PATH, where fnm's Node shadows Homebrew's. `npm` entries
+# setup.sh inherits the calling shell's PATH, where nvm's Node shadows Homebrew's. `npm` entries
 # have to land in Homebrew's Node, which is where scripts/update-brewfile.sh reads them back from.
 if PATH="$(brew --prefix)/bin:$PATH" brew bundle --no-upgrade --file="$repo_root/Brewfile"; then
   echo "✅ Brewfile complete."

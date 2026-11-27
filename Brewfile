@@ -31,8 +31,6 @@ brew "fd"
 brew "ffmpeg"
 # Collection of GNU find, xargs, and locate
 brew "findutils"
-# Fast and simple Node.js version manager
-brew "fnm"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # Library and utilities for processing GIFs

@@ -29,9 +29,10 @@ if ! command -v tree-sitter >/dev/null 2>&1; then
 fi
 
 # setup.sh runs each runs/ script as its own process, so 40-install-node.sh's node is not on PATH here.
-if command -v fnm >/dev/null 2>&1; then
-  eval "$(fnm env --shell bash)"
-  fnm use default >/dev/null
+if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+  export NVM_DIR="$HOME/.nvm"
+  source "$NVM_DIR/nvm.sh" --no-use
+  nvm use default >/dev/null
 fi
 
 if ! command -v npm >/dev/null 2>&1; then
