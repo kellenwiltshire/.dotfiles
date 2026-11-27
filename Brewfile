@@ -107,6 +107,8 @@ brew "hootsuite/homebrew/hs-opskit"
 brew "hootsuite/homebrew/hs-minikube@2"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace", trusted: true
+# Open source desktop password manager with encrypted vault and autofilling
+cask "bitwarden"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Open-source cross-platform alternative to AirDrop

@@ -105,6 +105,10 @@ if.app-name-regex-substring = 'Ghostty'
 run = ['layout tiling', 'move-node-to-workspace 1 --focus-follows-window']
 
 [[on-window-detected]]
+if.app-id = 'com.superlogical.rex'
+run = ['layout tiling']
+
+[[on-window-detected]]
 if.app-name-regex-substring = 'Slack|Messages'
 run = ['layout tiling', 'move-node-to-workspace 2']
 
