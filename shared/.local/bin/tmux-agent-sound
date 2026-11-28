@@ -8,8 +8,8 @@ state=${1:-}
 
 case "$(uname -s):$state" in
   Darwin:done | Darwin:question) exec afplay /System/Library/Sounds/Pop.aiff ;;
-  *:done) exec pw-play /usr/share/sounds/freedesktop/stereo/complete.oga ;;
-  *:question) exec pw-play /usr/share/sounds/freedesktop/stereo/message-new-instant.oga ;;
+  *:done) exec pw-play /usr/share/sounds/freedesktop/stereo/bell.oga ;;
+  *:question) exec pw-play /usr/share/sounds/freedesktop/stereo/bell.oga ;;
   *)
     echo "usage: tmux-agent-sound done|question (got '$state')" >&2
     exit 1
